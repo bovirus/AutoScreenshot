@@ -32,11 +32,23 @@ Auto Screenshot
 * Absolutely free and open source
 
 ## Screenshots
+<!--
 ![Main program window in Windows 7](images/main_window.png "Main program window in Windows 7")
 
 ![Tray icon](images/tray_icon_animation.gif "Tray icon")
+-->
 
-![Runinng on Linux Mint](images/main_window_in_linux_mint.png "Runinng on Linux Mint")
+![Main window in Linux Mint](images/main_window_in_linux_mint.png "Main window in Linux Mint")
+
+![Predefined filename templates](images/filename_template_samples.png "Predefined filename templates")
+
+![Filename variables description](images/filename_template_vars.png "Filename variables description")
+
+![Image format selection](images/image_format_selection.png "Image format selection")
+
+![Monitor selection](images/monitors.png "Monitor selection")
+
+![Hotkeys](images/hotkeys.png "Hotkeys")
 
 ## Languages
 * English
