@@ -104,7 +104,6 @@ type
     SeqNumberDigitsCountSpinEdit: TSpinEdit;
     SeqNumberDigitsCountLabel: TLabel;
     UniqueInstance1: TUniqueInstance;
-    procedure AboutProMenuItemClick(Sender: TObject);
     procedure CheckForUpdatesMenuItemClick(Sender: TObject);
     procedure AutoCheckForUpdatesMenuItemClick(Sender: TObject);
     procedure CompressionLevelComboBoxChange(Sender: TObject);
@@ -669,11 +668,6 @@ end;
 procedure TMainForm.CheckForUpdatesMenuItemClick(Sender: TObject);
 begin
   CheckForUpdates(False);
-end;
-
-procedure TMainForm.AboutProMenuItemClick(Sender: TObject);
-begin
-  OpenURL('https://artem78.github.io/AutoScreenshot/pages/pro.html?fromApp');
 end;
 
 procedure TMainForm.AutoCheckForUpdatesMenuItemClick(Sender: TObject);
