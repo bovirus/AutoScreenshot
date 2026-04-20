@@ -24,7 +24,6 @@ type
 
   TMainForm = class(TForm)
     AutoCheckForUpdatesMenuItem: TMenuItem;
-    Button1: TButton;
     EmptyLabel2: TLabel;
     EmptyLabel3: TLabel;
     EmptyLabel4: TLabel;
@@ -34,19 +33,12 @@ type
     EmptyLabel8: TLabel;
     FileMenuItem: TMenuItem;
     ExitMenuItem: TMenuItem;
-    Image1: TImage;
-    Label4: TLabel;
     EmptyLabel1: TLabel;
     MenuImageList: TImageList;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
     LangFlagImageList: TImageList;
-    AboutProMenuItem: TMenuItem;
     HomePageMenuItem: TMenuItem;
     MinimizeInsteadOfCloseCheckBox: TCheckBox;
     Panel1: TPanel;
-    ProAdvPanel: TPanel;
     SettingsPanel: TPanel;
     OutputDirPanel: TPanel;
     FileNameTemplatePanel: TPanel;
@@ -113,16 +105,12 @@ type
     SeqNumberDigitsCountLabel: TLabel;
     UniqueInstance1: TUniqueInstance;
     procedure AboutProMenuItemClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure CheckForUpdatesMenuItemClick(Sender: TObject);
     procedure AutoCheckForUpdatesMenuItemClick(Sender: TObject);
     procedure CompressionLevelComboBoxChange(Sender: TObject);
     procedure ExitMenuItemClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure HomePageMenuItemClick(Sender: TObject);
-    procedure Label3Click(Sender: TObject);
-    procedure Label3MouseEnter(Sender: TObject);
-    procedure Label3MouseLeave(Sender: TObject);
     procedure MinimizeInsteadOfCloseCheckBoxChange(Sender: TObject);
     procedure OldScreenshotCleanerEnabledCheckBoxChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -575,20 +563,6 @@ begin
 
   // Minimize instead of close
   MinimizeInsteadOfClose := Ini.ReadBool(DefaultConfigIniSection, 'MinimizeInsteadOfClose', False);
-
-  // PRO banner visibility
-  ProBannerVisible := Ini.ReadBool(DefaultConfigIniSection, 'ProBannerVisible', True);
-  if not ProBannerVisible then
-  begin
-    DT := ini.ReadDate(DefaultConfigIniSection, 'ProBannerClosedDate', MinDateTime);
-    if DaysBetween(DT, Now) >= 10 then
-    begin
-      ProBannerVisible := True;
-      Ini.WriteBool(DefaultConfigIniSection, 'ProBannerVisible', ProBannerVisible);
-    end;
-  end;
-  ProAdvPanel.Visible := ProBannerVisible;
-  Button1.Visible := ProBannerVisible;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -697,14 +671,6 @@ begin
   CheckForUpdates(False);
 end;
 
-procedure TMainForm.Button1Click(Sender: TObject);
-begin
-  ProAdvPanel.Visible:=False;
-  (Sender as TButton).Visible:=False;
-  ini.WriteBool(DefaultConfigIniSection, 'ProBannerVisible', False);
-  ini.WriteDate(DefaultConfigIniSection, 'ProBannerClosedDate', Now);
-end;
-
 procedure TMainForm.AboutProMenuItemClick(Sender: TObject);
 begin
   OpenURL('https://artem78.github.io/AutoScreenshot/pages/pro.html?fromApp');
@@ -740,21 +706,6 @@ end;
 procedure TMainForm.HomePageMenuItemClick(Sender: TObject);
 begin
   OpenURL('https://artem78.github.io/AutoScreenshot/?fromApp');
-end;
-
-procedure TMainForm.Label3Click(Sender: TObject);
-begin
-  OpenURL('https://artem78.github.io/AutoScreenshot/pages/pro.html?fromApp');
-end;
-
-procedure TMainForm.Label3MouseEnter(Sender: TObject);
-begin
-  Label3.Font.Style := Label3.Font.Style + [fsUnderline];
-end;
-
-procedure TMainForm.Label3MouseLeave(Sender: TObject);
-begin
-  Label3.Font.Style := Label3.Font.Style - [fsUnderline];
 end;
 
 procedure TMainForm.MinimizeInsteadOfCloseCheckBoxChange(Sender: TObject);
@@ -1211,7 +1162,6 @@ begin
     DonateMenuItem.Caption := Localizer.I18N('Donate');
     ExitMenuItem.Caption := Localizer.I18N('Exit');
     FileMenuItem.Caption := Localizer.I18N('File');
-    AboutProMenuItem.Caption := Localizer.I18N('TryPro') + '...';
     HomePageMenuItem.Caption := Localizer.I18N('VisitHomepage') + '...';
 
     // Main form components
@@ -1265,10 +1215,6 @@ begin
 
     PlaySoundsCheckBox.Caption := Localizer.I18N('PlaySounds');
     MinimizeInsteadOfCloseCheckBox.Caption := Localizer.I18N('MinimizeInSteadOfClose');
-    Label1.Caption := Localizer.I18N('ProBannerText1') + ' ';
-    Label2.Caption := ' ' + Localizer.I18N('ProBannerText2') + ' ';
-    Label3.Caption := Localizer.I18N('ProBannerText3');
-    Button1.Caption := Localizer.I18N('Close');
 
     // Tray icon
     RestoreWindowTrayMenuItem.Caption := Localizer.I18N('Restore');

@@ -18,7 +18,7 @@ object MainForm: TMainForm
   LCLVersion = '2.2.4.0'
   object SettingsPanel: TPanel
     Left = 0
-    Height = 514
+    Height = 566
     Top = 0
     Width = 723
     Align = alClient
@@ -29,7 +29,7 @@ object MainForm: TMainForm
     ChildSizing.VerticalSpacing = 6
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 2
-    ClientHeight = 514
+    ClientHeight = 566
     ClientWidth = 723
     TabOrder = 0
     object OutputDirLabel: TLabel
@@ -594,149 +594,10 @@ object MainForm: TMainForm
       TabOrder = 11
     end
   end
-  object ProAdvPanel: TPanel
-    Left = 0
-    Height = 52
-    Top = 601
-    Width = 723
-    Align = alBottom
-    AutoSize = True
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    ChildSizing.LeftRightSpacing = 15
-    ChildSizing.TopBottomSpacing = 15
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 999
-    ClientHeight = 50
-    ClientWidth = 721
-    TabOrder = 1
-    object Label1: TLabel
-      AnchorSideTop.Side = asrCenter
-      Left = 15
-      Height = 16
-      Top = 17
-      Width = 50
-      BorderSpacing.CellAlignVertical = ccaCenter
-      Caption = 'Try new '
-      ParentColor = False
-    end
-    object Image1: TImage
-      AnchorSideTop.Side = asrCenter
-      Left = 65
-      Height = 20
-      Top = 15
-      Width = 41
-      BorderSpacing.CellAlignVertical = ccaCenter
-      Picture.Data = {
-        1754506F727461626C654E6574776F726B47726170686963D505000089504E47
-        0D0A1A0A0000000D494844520000002900000014080600000010841485000000
-        097048597300000EC300000EC301C76FA8640000001974455874536F66747761
-        7265007777772E696E6B73636170652E6F72679BEE3C1A000005624944415448
-        89C5976F4855671CC73FCF39E7DEDBBD966E66C558D9A0CD3C1AD93F99B9494A
-        1234C2060B235A456DBD4C1A18D1703526631B11DB42E8CD5EA577618B42D146
-        6D14B3CD26C5CA31BD5141455A49E69D5EEBDE73EE3DCFB31747AFDEE9065BB3
-        7DE1C0B9CFF3FBF3FD7D9F3FE77785528AF1185AB4A85029B55B295502CC0504
-        530F09F40A212EE0389F675CBB7639655629957CC2B9B9FBC3A69988BCFBAEB2
-        BFFB4E397D7D4A49A9A614522AA7AF4FD967CFAAC83BEFA8B06926C2A659339E
-        971855F2F7BCBC1A7CBEDA406D2DDE37DEC03E7D1ABBB91979ED1AB2BF7FCA24
-        D4B2B2D07373F15454B8795B5B79F2C10728CB7AFFF950E813C02539B46851A1
-        849FD3EAEA343D3797C7555538BFFD3665C4FE0AFAE2C5A41D3E8CD3D5C5E35D
-        BBA4A654717A57578706A0A43CECDBBA5533162F66F8EDB79F0941919E0E3E5F
-        CA98F3EBAF0C6FDE8C5150806FF3664DC2210011CECF2F107EFFD5F473E77852
-        5D4DFCC20500D2EAEA3056AC4806509685ECE921F1C30F58F5F5A8681480F4B6
-        3684D73B62A4908F1EA1EEDDC33A768CF8F9F32924B4F9F3F1EFDE8D51528208
-        045C62376F623534607FF30D8C6C3D4F692981CF3E63A8AC0C158D2ED3F7CD9C
-        59E57DEBAD12919949ECCB2F93017D1B36A02F5880300C88C7118100FABC7918
-        4545184B966037350130ADAA0A919636228583366B16DA4B2FE15DBB96444707
-        F2FE7D00F4575E61C6B163E8797908A5704221500A3D3B1B4F6929223393445B
-        1B00F2F66D3CA5A5A0144E57D7434D09516CBCF61A7673F3A4CB92E8EC64B0A8
-        88C1152BB04F9C00C078F555B4175E48B1B31B1A182C2A62A8A202A4044DC328
-        2E4ECEFBF7EF47CC98818A4488545612A9AC64A8BC1CFBD42957944D9B30962D
-        1B8BD7DC8CC7F55FA90139BA6992B89C7A354D809424AE5E4DFE1433674E6AA6
-        EEDF07C771DF878701F7048F12B04F9DC2B97E3DA97CF4D021B728C0B366CD98
-        38972EA1E7E501E4180A32456626AAAF6FD2A45A5616DECA4A84DF8F6FCB1637
-        792C86BC7933C5CE78FD75021919E8F9F9E0F1E0DCB8817DF2A41B63DE3C10EE
-        37214970B4A88101647F3FDAECD968D9D963E30F1E20B2B200B20C01A99F9C3F
-        93CCCE26F0E18763CE9108D1DA5A542C9662A72F5C88BE7061B288D8175FA006
-        07479CC6A5D0F549926813ED346D54616500036A60E04531670EEAF6ED09FEB2
-        B717ABB111A251E4BD7B242E5F46452213ECECE3C7B18241FC7BF6B8AA1E3C48
-        E4CD37913D3D3877EE24F7E9C8128E719933076D64EBC85BB752C6D5C00040BF
-        8610D79DEE6E8CC2C2891502B2AF0FEBABAFB08241E2E7CF4F4A105C859D1B37
-        78BC772F2A12410402F8ABABDDB97098787B3B00DEF5EB31962F779D7C3EFC35
-        35EE56500ABBB53519CF282CC4E9EE06B8AE09A5DA133FFD84B7A262D2E4FF14
-        2A1CC63A7A14004F7939FACB2F0310ADAD453E7C8898368DE9F5F5A47FFF3D19
-        172FE259BD1A80D89123EEB534024F45C56861173529E571BBA5053D2707CFAA
-        554923E7CE1D9CAEAE9425980C4E28E4DA8D3B78567D3D89CE4E9C50084F7939
-        00F2EE5D86376CC00A069177EFA2CD9A05F138898E0E1EEFDA45ACAE6E8C6059
-        19FA8205C45B5A40D34E0AA514837979EDDE6DDB564EDBB993C8C68DC8DEDEA7
-        52F369A0CD9DCB8CC64662478E603534FCF85C7777897BACA4ACB2EAEB65A2B3
-        93E9C1204641C1FF42D058BA94E9C120892B57B0BEFE5A6A42540363AD5A383F
-        FF7DE1F17C1CF8E823BCEBD6617FFB2DF1E6669CD1564DFDED4DF5EF2084DBAA
-        99A6DBAAAD5D8BDDD4C493030750B6BDEFF950E853E04F4DAF69D6844D3311D9
-        B143D967CE3CBBA6F7C103659F39A322DBB7ABB069C6077273F74DDAF48E62D0
-        34972B780F2146FF3E68FFBD841320811EA04DC0E719DDDDBF8C9FFC03CADC51
-        DC85910B0A0000000049454E44AE426082
-      }
-    end
-    object Label2: TLabel
-      AnchorSideTop.Side = asrCenter
-      Left = 106
-      Height = 16
-      Top = 17
-      Width = 196
-      BorderSpacing.CellAlignVertical = ccaCenter
-      Caption = ' version with extended features! '
-      ParentColor = False
-    end
-    object Label3: TLabel
-      AnchorSideTop.Side = asrCenter
-      Cursor = crHandPoint
-      Left = 302
-      Height = 16
-      Top = 17
-      Width = 73
-      BorderSpacing.CellAlignVertical = ccaCenter
-      Caption = 'Read more...'
-      Font.CharSet = RUSSIAN_CHARSET
-      Font.Color = clBlue
-      Font.Pitch = fpVariable
-      Font.Quality = fqDraft
-      ParentColor = False
-      ParentFont = False
-      OnClick = Label3Click
-      OnMouseEnter = Label3MouseEnter
-      OnMouseLeave = Label3MouseLeave
-    end
-    object Label4: TLabel
-      Left = 375
-      Height = 20
-      Top = 15
-      Width = 87
-      Caption = '                             '
-      ParentColor = False
-    end
-  end
-  object Button1: TButton
-    AnchorSideTop.Control = ProAdvPanel
-    AnchorSideTop.Side = asrCenter
-    AnchorSideRight.Control = ProAdvPanel
-    AnchorSideRight.Side = asrBottom
-    Left = 665
-    Height = 28
-    Top = 613
-    Width = 43
-    Anchors = [akTop, akRight]
-    AutoSize = True
-    BorderSpacing.Right = 15
-    BorderSpacing.CellAlignVertical = ccaCenter
-    Caption = 'Close'
-    OnClick = Button1Click
-    TabOrder = 2
-  end
   object ButtonsPanel: TPanel
     Left = 0
     Height = 87
-    Top = 514
+    Top = 566
     Width = 723
     Align = alBottom
     AutoSize = True
@@ -744,7 +605,7 @@ object MainForm: TMainForm
     ChildSizing.TopBottomSpacing = 15
     ClientHeight = 87
     ClientWidth = 723
-    TabOrder = 3
+    TabOrder = 1
     object TakeScreenshotButton: TButton
       AnchorSideLeft.Control = ButtonsPanel
       AnchorSideTop.Side = asrCenter
@@ -894,11 +755,6 @@ object MainForm: TMainForm
       object HomePageMenuItem: TMenuItem
         Caption = 'Homepage'
         OnClick = HomePageMenuItemClick
-      end
-      object AboutProMenuItem: TMenuItem
-        Caption = 'PRO...'
-        ImageIndex = 0
-        OnClick = AboutProMenuItemClick
       end
       object AboutMenuItem: TMenuItem
         Caption = 'About...'
