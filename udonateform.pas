@@ -83,6 +83,17 @@ end;
 { TDonateForm }
 
 procedure TDonateForm.FormCreate(Sender: TObject);
+  // Create any dummy empty control to prevent layout broken when no control in grid position
+  procedure AddEmptyCtrl;
+  begin
+    with TLabel.Create(PaymentMethodsPanel) do
+    begin
+      Text := '';
+      AutoSize := True;
+      Parent := PaymentMethodsPanel;
+    end;
+  end;
+
 var
   I: Integer;
   IconBase64, DonateUrl: String;
@@ -108,13 +119,7 @@ begin
       end
       else
       begin
-        // Create any dummy empty control to prevent layout broken when no icon
-        with TLabel.Create(PaymentMethodsPanel) do
-        begin
-          Text := '';
-          AutoSize := True;
-          Parent := PaymentMethodsPanel;
-        end;
+        AddEmptyCtrl;
       end;
 
       with TLabel.Create(PaymentMethodsPanel) do
@@ -157,13 +162,7 @@ begin
       end
       else
       begin
-        // Create any dummy empty control to prevent layout broken when no item
-        with TLabel.Create(PaymentMethodsPanel) do
-        begin
-          Text := '';
-          AutoSize := True;
-          Parent := PaymentMethodsPanel;
-        end;
+        AddEmptyCtrl;
       end;
     end;
   except
