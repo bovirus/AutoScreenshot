@@ -226,7 +226,13 @@ end;
 
 procedure TDonateForm.LoadData();
 const
+  {$IFOPT D+}
+  ApiUrl = 'https://api.github.com/gists/f293c446c3f2e83900f5a1d7b5596755';
+  JsonFileName = 'test_wallets.json';
+  {$else}
   ApiUrl = 'https://api.github.com/gists/6c79ab382865da9b598927194c52eb09';
+  JsonFileName = 'donate_wallets.json';
+  {$ENDIF}
 var
   Http: TFPHTTPClient;
   Json: TJSONData;
@@ -244,7 +250,7 @@ begin
     Http.AddHeader('User-Agent', 'Auto Screenshot');
     Json := GetJSON(Http.Get(ApiUrl));
     try
-      Str := TJSONObject(Json).Objects['files'].Objects['donate_wallets.json'].Strings['content'];
+      Str := TJSONObject(Json).Objects['files'].Objects[JsonFileName].Strings['content'];
     finally
       Json.Free;
     end;
