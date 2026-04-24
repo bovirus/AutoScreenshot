@@ -271,7 +271,7 @@ begin
               if Count > 2 then
               begin
                 IconBase64 := TJSONObject(Items[2]).Get('icon', '');
-                DonateUrl     := TJSONObject(Items[2]).Get('url', '');;
+                DonateUrl  := TJSONObject(Items[2]).Get('payment_url', '');
               end;
             except
             end;
