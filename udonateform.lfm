@@ -12,9 +12,36 @@ object DonateForm: TDonateForm
   ChildSizing.VerticalSpacing = 6
   ChildSizing.Layout = cclLeftToRightThenTopToBottom
   ChildSizing.ControlsPerLine = 5
+  ClientHeight = 240
+  ClientWidth = 320
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poOwnerFormCenter
   LCLVersion = '2.2.4.0'
+  object DonateInfoLabel: TLabel
+    Left = 15
+    Height = 16
+    Top = 15
+    Width = 290
+    Align = alTop
+    Caption = '....'
+    ParentColor = False
+    WordWrap = True
+  end
+  object PaymentMethodsPanel: TPanel
+    Left = 15
+    Height = 188
+    Top = 37
+    Width = 290
+    Align = alClient
+    AutoSize = True
+    BevelOuter = bvNone
+    ChildSizing.TopBottomSpacing = 15
+    ChildSizing.HorizontalSpacing = 6
+    ChildSizing.VerticalSpacing = 6
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 5
+    TabOrder = 0
+  end
 end

@@ -5,7 +5,7 @@ unit uDonateForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls;
 
 type
 
@@ -16,6 +16,8 @@ type
   { TDonateForm }
 
   TDonateForm = class(TForm)
+    DonateInfoLabel: TLabel;
+    PaymentMethodsPanel: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -34,7 +36,7 @@ var
 
 implementation
 
-uses StdCtrls, Clipbrd, LCLIntf, ExtCtrls, uLocalization, fpjson,
+uses Clipbrd, LCLIntf, uLocalization, fpjson,
   opensslsockets, base64, StrUtils, fphttpclient;
 
 {$R *.lfm}
@@ -86,6 +88,7 @@ var
   IconBase64, DonateUrl: String;
 begin
   Caption := Localizer.I18N('Donate');
+  DonateInfoLabel.Caption := Localizer.I18N('DonateInfo');
 
   try
     LoadData();
@@ -95,71 +98,71 @@ begin
       IconBase64 := Entries[I].IconBase64;
       if not IconBase64.IsEmpty then
       begin
-        with TImage.Create(Self) do
+        with TImage.Create(PaymentMethodsPanel) do
         begin
           Picture.LoadFromBase64(IconBase64);
           BorderSpacing.CellAlignVertical := ccaCenter;
           BorderSpacing.CellAlignHorizontal := {ccaCenter} ccaRightBottom;
-          Parent := Self;
+          Parent := PaymentMethodsPanel;
         end;
       end
       else
       begin
         // Create any dummy empty control to prevent layout broken when no icon
-        with TLabel.Create(Self) do
+        with TLabel.Create(PaymentMethodsPanel) do
         begin
           Text := '';
           AutoSize := True;
-          Parent := Self;
+          Parent := PaymentMethodsPanel;
         end;
       end;
 
-      with TLabel.Create(Self) do
+      with TLabel.Create(PaymentMethodsPanel) do
       begin
         Caption := Entries[I].Title + ':';
         BorderSpacing.CellAlignVertical := ccaCenter;
         //BorderSpacing.CellAlignHorizontal := ccaRightBottom;
-        Parent := Self;
+        Parent := PaymentMethodsPanel;
       end;
 
-      with TEdit.Create(Self) do
+      with TEdit.Create(PaymentMethodsPanel) do
       begin
         Width := 300;
         Constraints.MinWidth := Width;
         Text := Entries[I].WalletID;
         ReadOnly := True;
         BorderSpacing.CellAlignVertical := ccaCenter;
-        Parent := Self;
+        Parent := PaymentMethodsPanel;
       end;
 
-      with TButton.Create(Self) do
+      with TButton.Create(PaymentMethodsPanel) do
       begin
         Caption := Localizer.I18N('Copy');
         OnClick := @CopyWalletToClipboard;
         BorderSpacing.CellAlignVertical := ccaCenter;
-        Parent := Self;
+        Parent := PaymentMethodsPanel;
       end;
 
       DonateUrl := Entries[I].Url;
       if not DonateUrl.IsEmpty then
       begin
-        with TButton.Create(Self) do
+        with TButton.Create(PaymentMethodsPanel) do
         begin
           Caption := Localizer.I18N('TransferMoney');
           OnClick := @OpenDonateUrl;
           BorderSpacing.CellAlignVertical := ccaCenter;
-          Parent := Self;
+          Parent := PaymentMethodsPanel;
           Name := 'OpenDonateUrlButton_' + IntToStr(I);
         end;
       end
       else
       begin
         // Create any dummy empty control to prevent layout broken when no item
-        with TLabel.Create(Self) do
+        with TLabel.Create(PaymentMethodsPanel) do
         begin
           Text := '';
           AutoSize := True;
-          Parent := Self;
+          Parent := PaymentMethodsPanel;
         end;
       end;
     end;
