@@ -37,7 +37,7 @@ var
 implementation
 
 uses Clipbrd, LCLIntf, uLocalization, fpjson,
-  opensslsockets, base64, StrUtils, fphttpclient;
+  opensslsockets, base64, StrUtils, fphttpclient, Buttons;
 
 {$R *.lfm}
 
@@ -106,6 +106,7 @@ begin
 
     for I := 0 to Length(Entries) - 1 do
     begin
+      // Payment method icon
       IconBase64 := Entries[I].IconBase64;
       if not IconBase64.IsEmpty then
       begin
@@ -122,48 +123,65 @@ begin
         AddEmptyCtrl;
       end;
 
+      // Payment method name
       with TLabel.Create(PaymentMethodsPanel) do
       begin
-        Caption := Entries[I].Title + ':';
+        Caption := Entries[I].Title {+ ':'};
         BorderSpacing.CellAlignVertical := ccaCenter;
         //BorderSpacing.CellAlignHorizontal := ccaRightBottom;
         Parent := PaymentMethodsPanel;
       end;
 
-      with TEdit.Create(PaymentMethodsPanel) do
-      begin
-        Width := 300;
-        Constraints.MinWidth := Width;
-        Text := Entries[I].WalletID;
-        ReadOnly := True;
-        BorderSpacing.CellAlignVertical := ccaCenter;
-        Parent := PaymentMethodsPanel;
-      end;
-
-      with TButton.Create(PaymentMethodsPanel) do
-      begin
-        Caption := Localizer.I18N('Copy');
-        OnClick := @CopyWalletToClipboard;
-        BorderSpacing.CellAlignVertical := ccaCenter;
-        Parent := PaymentMethodsPanel;
-      end;
-
+      // Payment link button
       DonateUrl := Entries[I].Url;
       if not DonateUrl.IsEmpty then
       begin
-        with TButton.Create(PaymentMethodsPanel) do
+        with TBitBtn.Create(PaymentMethodsPanel) do
         begin
-          Caption := Localizer.I18N('TransferMoney');
           OnClick := @OpenDonateUrl;
           BorderSpacing.CellAlignVertical := ccaCenter;
           Parent := PaymentMethodsPanel;
           Name := 'OpenDonateUrlButton_' + IntToStr(I);
+          Caption:='';
+          LoadGlyphFromResourceName(HINSTANCE, '_EXTERNAL_LINK_ICON');
+          Hint:=Localizer.I18N('OpenPayLinkInBrowser');
+          ShowHint:=True;
         end;
       end
       else
       begin
         AddEmptyCtrl;
       end;
+
+      if not Entries[I].WalletID.IsEmpty then  // allowed to be empty
+      begin
+        // Wallet identifier
+        with TEdit.Create(PaymentMethodsPanel) do
+        begin
+          Width := 300;
+          Constraints.MinWidth := Width;
+          Text := Entries[I].WalletID;
+          ReadOnly := True;
+          BorderSpacing.CellAlignVertical := ccaCenter;
+          Parent := PaymentMethodsPanel;
+          BorderSpacing.Left := {16} 25;
+        end;
+
+        // Copy wallet identifier button
+        with TButton.Create(PaymentMethodsPanel) do
+        begin
+          Caption := Localizer.I18N('Copy');
+          OnClick := @CopyWalletToClipboard;
+          BorderSpacing.CellAlignVertical := ccaCenter;
+          Parent := PaymentMethodsPanel;
+        end;
+      end
+      else
+      begin
+        AddEmptyCtrl;
+        AddEmptyCtrl;
+      end;
+
     end;
   except
     // No action needed there
