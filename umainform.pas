@@ -1233,7 +1233,7 @@ begin
       LanguageSubMenu.Caption := LanguageSubMenu.Caption + ' (Language)';
     HelpSubMenu.Caption := Localizer.I18N('Help');
     AboutMenuItem.Caption := Localizer.I18N('About') + '...';
-    CheckForUpdatesMenuItem.Caption := Localizer.I18N('CheckForUpdates');
+    CheckForUpdatesMenuItem.Caption := Localizer.I18N('CheckForUpdates') + '...';
     AutoCheckForUpdatesMenuItem.Caption := Localizer.I18N('AutoCheckForUpdates');
     HotKetsSettingsMenuItem.Caption := Localizer.I18N('EditHotKeys') + '...';
     DonateMenuItem.Caption := Localizer.I18N('Donate');
