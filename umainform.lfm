@@ -707,10 +707,10 @@ object MainForm: TMainForm
     object AutoCaptureControlGroup: TGroupBox
       AnchorSideLeft.Control = ButtonsPanel
       AnchorSideLeft.Side = asrCenter
-      Left = 251
+      Left = 192
       Height = 57
       Top = 15
-      Width = 220
+      Width = 338
       AutoSize = True
       Caption = 'Automatic capture'
       ChildSizing.LeftRightSpacing = 6
@@ -718,9 +718,9 @@ object MainForm: TMainForm
       ChildSizing.HorizontalSpacing = 6
       ChildSizing.VerticalSpacing = 6
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 2
+      ChildSizing.ControlsPerLine = 3
       ClientHeight = 40
-      ClientWidth = 218
+      ClientWidth = 336
       TabOrder = 1
       object StartAutoCaptureButton: TBitBtn
         Left = 6
@@ -728,6 +728,7 @@ object MainForm: TMainForm
         Top = 6
         Width = 100
         AutoSize = True
+        BorderSpacing.CellAlignVertical = ccaCenter
         Caption = 'Enable'
         Constraints.MinWidth = 100
         NumGlyphs = 2
@@ -741,6 +742,7 @@ object MainForm: TMainForm
         Top = 6
         Width = 100
         AutoSize = True
+        BorderSpacing.CellAlignVertical = ccaCenter
         Caption = 'Disable'
         Constraints.MinWidth = 100
         NumGlyphs = 2
@@ -748,13 +750,17 @@ object MainForm: TMainForm
         Spacing = 8
         TabOrder = 1
       end
+      object NextShotTimeLabel: TLabel
+        Left = 232
+        Height = 16
+        Top = 12
+        Width = 98
+        BorderSpacing.Left = 20
+        BorderSpacing.CellAlignVertical = ccaCenter
+        Caption = 'Next shot at xxx'
+        ParentColor = False
+      end
     end
-  end
-  object Timer: TTimer
-    Enabled = False
-    OnTimer = TimerTimer
-    Left = 16
-    Top = 124
   end
   object TrayIcon: TTrayIcon
     PopUpMenu = TrayIconPopupMenu
@@ -883,5 +889,11 @@ object MainForm: TMainForm
       189AFE2FE8F663B33332F2334EFB81E190874F7F7CFC6738BBB7F71B9A9BDE65
       23C2FFC373E2C3FFC37358F88FF4D40B000A99311F
     }
+  end
+  object AutoCaptureUpdaterTimer: TTimer
+    Interval = 300
+    OnTimer = AutoCaptureUpdaterTimerTimer
+    Left = 281
+    Top = 133
   end
 end

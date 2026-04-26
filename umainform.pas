@@ -34,6 +34,7 @@ type
     EmptyLabel9: TLabel;
     Label1: TLabel;
     Label2: TLabel;
+    NextShotTimeLabel: TLabel;
     SkipSimilarPanel: TPanel;
     SkipSimilarCheckBox: TCheckBox;
     FileMenuItem: TMenuItem;
@@ -65,9 +66,9 @@ type
     CheckForUpdatesMenuItem: TMenuItem;
     OutputDirEdit: TDirectoryEdit;
     SkipSimilarMatchPercentSpinEdit: TSpinEdit;
-    Timer: TTimer;
     OutputDirLabel: TLabel;
     CaptureIntervalLabel: TLabel;
+    AutoCaptureUpdaterTimer: TTimer;
     TrayIcon: TTrayIcon;
     ImageFormatLabel: TLabel;
     TakeScreenshotButton: TButton;
@@ -111,6 +112,7 @@ type
     SeqNumberDigitsCountSpinEdit: TSpinEdit;
     SeqNumberDigitsCountLabel: TLabel;
     UniqueInstance1: TUniqueInstance;
+    procedure AutoCaptureUpdaterTimerTimer(Sender: TObject);
     procedure CheckForUpdatesMenuItemClick(Sender: TObject);
     procedure AutoCheckForUpdatesMenuItemClick(Sender: TObject);
     procedure CompressionLevelComboBoxChange(Sender: TObject);
@@ -195,6 +197,8 @@ type
     public
     FileJournal: TFileJournal;
     private
+
+    AutoCaptureTimer: TTimerV2;
     
     { Methods }
     procedure SetTimerEnabled(AEnabled: Boolean);
@@ -535,7 +539,7 @@ begin
   end;
 
   // Start autocapture
-  Timer.Interval := SecondOfTheDay(CaptureIntervalDateTimePicker.Time) * MSecsPerSec;
+  AutoCaptureTimer.Interval := SecondOfTheDay(CaptureIntervalDateTimePicker.Time) * MSecsPerSec;
   StartCaptureOnStartUpCheckBox.Checked :=
       Ini.ReadBool(DefaultConfigIniSection, 'StartCaptureOnStartUp', {True} False);
   IsTimerEnabled := StartCaptureOnStartUpCheckBox.Checked;
@@ -606,6 +610,10 @@ var
   HotKey: THotKey;
   IniFileName: String;
 begin
+  AutoCaptureTimer := TTimerV2.Create(Self);
+  AutoCaptureTimer.Enabled:=False;
+  AutoCaptureTimer.OnTimer:=@TimerTimer;
+
   {DebugLn('Program started');
   DebugLn('Version: ', GetProgramVersionStr);
   DebugLn('Initializing...');}
@@ -696,6 +704,17 @@ end;
 procedure TMainForm.CheckForUpdatesMenuItemClick(Sender: TObject);
 begin
   CheckForUpdates(False);
+end;
+
+procedure TMainForm.AutoCaptureUpdaterTimerTimer(Sender: TObject);
+var
+  Sec: Integer;
+begin
+  Sec := AutoCaptureTimer.SecondsBeforeNextExecution;
+  if Sec < 0 then
+    NextShotTimeLabel.Caption := ''
+  else
+    NextShotTimeLabel.Caption := Format('Next shot after %d seconds', [Sec]);
 end;
 
 procedure TMainForm.AutoCheckForUpdatesMenuItemClick(Sender: TObject);
@@ -831,7 +850,7 @@ begin
     CaptureIntervalDateTimePicker.Time := IncSecond(CaptureIntervalDateTimePicker.Time, Seconds);
   end;
   Ini.WriteFloat(DefaultConfigIniSection, 'CaptureInterval', Seconds / SecsPerMin);
-  Timer.Interval := Seconds * MSecsPerSec;
+  AutoCaptureTimer.Interval := Seconds * MSecsPerSec;
 end;
 
 procedure TMainForm.PlaySoundsCheckBoxChange(Sender: TObject);
@@ -867,11 +886,11 @@ begin
     // ToDo: May add comparision of current screenshot with the last one,
     // and if they equal, do not save current
 
-    if Timer.Interval > UserIdleTime then
+    if AutoCaptureTimer.Interval > UserIdleTime then
       MakeScreenshot
     else
       DebugLn('Automatic capture skipped (Timer.Interval=%d, UserIdleTime=%d)',
-          [Timer.Interval, UserIdleTime]);
+          [AutoCaptureTimer.Interval, UserIdleTime]);
   end
   else
     MakeScreenshot;
@@ -879,12 +898,12 @@ end;
 
 function TMainForm.GetTimerEnabled: Boolean;
 begin
-  Result := Timer.Enabled;
+  Result := AutoCaptureTimer.Enabled;
 end;
 
 procedure TMainForm.SetTimerEnabled(AEnabled: Boolean);
 begin
-  Timer.Enabled := AEnabled;
+  AutoCaptureTimer.Enabled := AEnabled;
   StartAutoCaptureButton.Enabled := not AEnabled;
   StopAutoCaptureButton.Enabled := AEnabled;
   // Tray menu
@@ -946,7 +965,7 @@ begin
     begin
       DebugLn('Execution failed: ', E.ToString);
 
-      if not Timer.Enabled then // Manual capture
+      if not AutoCaptureTimer.Enabled then // Manual capture
       begin
         ErrMsg := {'Execution of custom command failed: ' +} E.Message;
         MessageDlg('Auto Screenshot', ErrMsg, mtWarning, [mbOK], '');
@@ -999,7 +1018,7 @@ begin
     begin
       DebugLn('Execution failed: ', E.ToString);
 
-      if not Timer.Enabled then // Manual capture
+      if not AutoCaptureTimer.Enabled then // Manual capture
       begin
         ErrMsg := {'Execution of custom command failed: ' +} E.Message;
         MessageDlg('Auto Screenshot', ErrMsg, mtWarning, [mbOK], '');

@@ -7,7 +7,7 @@ unit uUtilsMore;
 interface
 
 uses
-  Classes, SysUtils, StdCtrls;
+  Classes, SysUtils, StdCtrls, CustomTimer;
 
 type
 
@@ -55,10 +55,35 @@ type
 function {CompareImages} ImagesEqual(const AImgFilename1, AImgFilename2: String;
               APercentThreshold: Integer = 100): Boolean;
 
+type
+
+  { Almost the same as TTimer, but adds two methods for recieving time of next run }
+
+  { TTimerV2 }
+
+  TTimerV2 = class({TTimer} TCustomTimer)
+  private
+    FLastExecutionTime: TDateTime;
+    function GetNextExecutionTime: TDateTime;
+    function GetSecondsBeforeNextExecution: Integer;
+    procedure DoOnTimer; override;
+    procedure UpdateTimer; override;
+  public
+    property NextExecutionTime: TDateTime read GetNextExecutionTime;
+    property SecondsBeforeNextExecution: Integer read GetSecondsBeforeNextExecution;
+  {published // from TTimer
+    property Enabled;
+    property Interval;
+    property OnTimer;
+    property OnStartTimer;
+    property OnStopTimer;}
+  end;
+
 implementation
 
 uses
-  RegExpr, StrUtils, Menus  {for ShortCutToKey}, LCLProc, LCLType, Graphics, LCLIntf, Math, BGRABitmap, BGRABitmapTypes;
+  RegExpr, StrUtils, DateUtils, Menus {for ShortCutToKey}, LCLProc, LCLType, Graphics, LCLIntf,
+  Math, BGRABitmap, BGRABitmapTypes;
 
 type
   { TJoinInteger }
@@ -117,6 +142,40 @@ end;
 operator<>(HotKey1, Hotkey2: THotKey): Boolean;
 begin
   Result := not (HotKey1 = Hotkey2);
+end;
+
+{ TTimerV2 }
+
+{ Returns time of next timer call. If timer disabled returns MinDateTime. }
+function TTimerV2.GetNextExecutionTime: TDateTime;
+begin
+  if Enabled then
+    Result := IncMilliSecond(FLastExecutionTime, Interval)
+  else
+    Result := MinDateTime;
+end;
+
+{ Returns number of seconds before next timer call. If timer disabled returns -1. }
+function TTimerV2.GetSecondsBeforeNextExecution: Integer;
+begin
+  if Enabled then
+    Result := SecondsBetween(NextExecutionTime, now)
+  else
+    Result := -1;
+end;
+
+procedure TTimerV2.DoOnTimer;
+begin
+  FLastExecutionTime := Now;
+
+  inherited {DoOnTimer};
+end;
+
+procedure TTimerV2.UpdateTimer;
+begin
+  FLastExecutionTime := Now;
+
+  inherited UpdateTimer;
 end;
 
 { TComboBoxHelper }
