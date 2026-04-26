@@ -710,6 +710,12 @@ procedure TMainForm.AutoCaptureUpdaterTimerTimer(Sender: TObject);
 var
   Sec: Integer;
 begin
+  if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
+  begin  // skip when user inactive
+    NextShotTimeLabel.Caption := '';
+    Exit;
+  end;
+
   Sec := AutoCaptureTimer.SecondsBeforeNextExecution;
   if Sec < 0 then
     NextShotTimeLabel.Caption := ''
