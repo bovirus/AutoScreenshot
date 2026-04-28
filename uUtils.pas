@@ -82,6 +82,9 @@ function ParentDirectory(const ADir: String): String;
 
 function ISO8601ToReadableDate(const AStr: string): string;
 
+// 3723 => 01:02:03
+function SecondsToHMS(ASecs: Integer): string;
+
 implementation
 
 uses
@@ -505,6 +508,15 @@ var
 begin
   dt := ISO8601ToDate(AStr);
   Result := DateToStr(dt);
+end;
+
+function SecondsToHMS(ASecs: Integer): string;
+var
+  DT, TDiff: TDateTime;
+begin
+  DT := IncSecond(Now, ASecs);
+  TDiff:=DT-Now;
+  Result:=TimeToStr(TDiff);
 end;
 
 {$IfDef Windows}

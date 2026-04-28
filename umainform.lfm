@@ -18,7 +18,7 @@ object MainForm: TMainForm
   LCLVersion = '2.2.4.0'
   object SettingsPanel: TPanel
     Left = 0
-    Height = 566
+    Height = 542
     Top = 0
     Width = 723
     Align = alClient
@@ -29,7 +29,7 @@ object MainForm: TMainForm
     ChildSizing.VerticalSpacing = 6
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 2
-    ClientHeight = 566
+    ClientHeight = 542
     ClientWidth = 723
     TabOrder = 0
     object OutputDirLabel: TLabel
@@ -707,10 +707,10 @@ object MainForm: TMainForm
     object AutoCaptureControlGroup: TGroupBox
       AnchorSideLeft.Control = ButtonsPanel
       AnchorSideLeft.Side = asrCenter
-      Left = 192
+      Left = 251
       Height = 57
       Top = 15
-      Width = 338
+      Width = 220
       AutoSize = True
       Caption = 'Automatic capture'
       ChildSizing.LeftRightSpacing = 6
@@ -720,7 +720,7 @@ object MainForm: TMainForm
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 3
       ClientHeight = 40
-      ClientWidth = 336
+      ClientWidth = 218
       TabOrder = 1
       object StartAutoCaptureButton: TBitBtn
         Left = 6
@@ -750,17 +750,18 @@ object MainForm: TMainForm
         Spacing = 8
         TabOrder = 1
       end
-      object NextShotTimeLabel: TLabel
-        Left = 232
-        Height = 16
-        Top = 12
-        Width = 98
-        BorderSpacing.Left = 20
-        BorderSpacing.CellAlignVertical = ccaCenter
-        Caption = 'Next shot at xxx'
-        ParentColor = False
-      end
     end
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 24
+    Top = 542
+    Width = 723
+    Panels = <    
+      item
+        Width = 200
+      end>
+    SimplePanel = False
   end
   object TrayIcon: TTrayIcon
     PopUpMenu = TrayIconPopupMenu
@@ -891,7 +892,6 @@ object MainForm: TMainForm
     }
   end
   object AutoCaptureUpdaterTimer: TTimer
-    Interval = 300
     OnTimer = AutoCaptureUpdaterTimerTimer
     Left = 281
     Top = 133

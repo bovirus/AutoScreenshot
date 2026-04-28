@@ -14,7 +14,7 @@ uses
   {Messages,} SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, {ComCtrls,} ExtCtrls, StdCtrls, inifiles, Spin, {FileCtrl,}
   Menus, Buttons, EditBtn, uLocalization, DateTimePicker,
-  LCLIntf, ScreenGrabber, uHotKeysForm, uUtilsMore, GlobalKeyHook,
+  LCLIntf, ComCtrls, ScreenGrabber, uHotKeysForm, uUtilsMore, GlobalKeyHook,
   OldScreenshotCleaner, UniqueInstance, uplaysound, ZStream { for Tcompressionlevel };
 
 type
@@ -34,7 +34,6 @@ type
     EmptyLabel9: TLabel;
     Label1: TLabel;
     Label2: TLabel;
-    NextShotTimeLabel: TLabel;
     SkipSimilarPanel: TPanel;
     SkipSimilarCheckBox: TCheckBox;
     FileMenuItem: TMenuItem;
@@ -69,6 +68,7 @@ type
     OutputDirLabel: TLabel;
     CaptureIntervalLabel: TLabel;
     AutoCaptureUpdaterTimer: TTimer;
+    StatusBar1: TStatusBar;
     TrayIcon: TTrayIcon;
     ImageFormatLabel: TLabel;
     TakeScreenshotButton: TButton;
@@ -275,6 +275,8 @@ type
     procedure SetSkipSimilarMatchPercent(AVal: Integer);
     function GetSkipSimilarMatchPercent: Integer;
 
+    procedure UpdateStatusBar;
+
 
     { Properties }
     property IsTimerEnabled: Boolean read GetTimerEnabled write SetTimerEnabled;
@@ -423,6 +425,10 @@ begin
       Append('');
   end;
 
+  // Fix incorrect order for statusbar and panel with buttons
+  // https://wiki.lazarus.freepascal.org/Autosize_/_Layout#Order_of_controls_with_same_Align
+  ButtonsPanel.Top:=0;
+  StatusBar1.Top:=999;
 end;
 
 procedure TMainForm.ReadSettings;
@@ -707,20 +713,8 @@ begin
 end;
 
 procedure TMainForm.AutoCaptureUpdaterTimerTimer(Sender: TObject);
-var
-  Sec: Integer;
 begin
-  if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
-  begin  // skip when user inactive
-    NextShotTimeLabel.Caption := '';
-    Exit;
-  end;
-
-  Sec := AutoCaptureTimer.SecondsBeforeNextExecution;
-  if Sec < 0 then
-    NextShotTimeLabel.Caption := ''
-  else
-    NextShotTimeLabel.Caption := Format('Next shot after %d seconds', [Sec]);
+  UpdateStatusBar;
 end;
 
 procedure TMainForm.AutoCheckForUpdatesMenuItemClick(Sender: TObject);
@@ -928,6 +922,9 @@ begin
     else
       PlaySound('stop.wav');
   end;
+
+  // Update statusbar
+  UpdateStatusBar;
 
   if AEnabled then
     DebugLn('Automatic capture started')
@@ -2204,6 +2201,32 @@ end;
 function TMainForm.GetSkipSimilarMatchPercent: Integer;
 begin
   Result := SkipSimilarMatchPercentSpinEdit.Value;
+end;
+
+procedure TMainForm.UpdateStatusBar;
+const
+  NextShotTimePanelIdx = 0;
+var
+  Sec: Integer;
+begin
+  with StatusBar1.Panels.Items[NextShotTimePanelIdx] do
+  begin
+    if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
+    begin  // skip when user inactive
+      Text := '';
+      Exit;
+    end;
+
+    Sec := AutoCaptureTimer.SecondsBeforeNextExecution;
+    if Sec < 0 then
+      Text := ''
+    else
+    begin
+      //Text := Format('Next shot after %d seconds', [Sec]);
+      Text := Format('Next shot after %s', [SecondsToHMS(Sec)]);
+    end;
+  end;
+
 end;
 
 {$IfDef Windows}
