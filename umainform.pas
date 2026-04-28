@@ -2204,29 +2204,29 @@ begin
 end;
 
 procedure TMainForm.UpdateStatusBar;
-const
-  NextShotTimePanelIdx = 0;
 var
   Sec: Integer;
 begin
-  with StatusBar1.Panels.Items[NextShotTimePanelIdx] do
+  if not IsTimerEnabled then
+    StatusBar1.SimpleText:=''
+  else
   begin
     if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
-    begin  // skip when user inactive
-      Text := '';
-      Exit;
-    end;
-
-    Sec := AutoCaptureTimer.SecondsBeforeNextExecution;
-    if Sec < 0 then
-      Text := ''
-    else
+    begin  // user inactive
+      StatusBar1.SimpleText := 'Automatic capture paused due to user inactivity';
+    end
+    else   // show next run time
     begin
-      //Text := Format('Next shot after %d seconds', [Sec]);
-      Text := Format('Next shot after %s', [SecondsToHMS(Sec)]);
+      Sec := AutoCaptureTimer.SecondsBeforeNextExecution;
+      if Sec < 0 then
+        StatusBar1.SimpleText := ''
+      else
+      begin
+        //Text := Format('Next shot after %d seconds', [Sec]);
+        StatusBar1.SimpleText := Format('Next shot after %s', [SecondsToHMS(Sec)]);
+      end;
     end;
   end;
-
 end;
 
 {$IfDef Windows}

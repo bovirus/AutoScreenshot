@@ -757,11 +757,7 @@ object MainForm: TMainForm
     Height = 24
     Top = 542
     Width = 723
-    Panels = <    
-      item
-        Width = 200
-      end>
-    SimplePanel = False
+    Panels = <>
   end
   object TrayIcon: TTrayIcon
     PopUpMenu = TrayIconPopupMenu
