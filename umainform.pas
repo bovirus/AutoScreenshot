@@ -14,7 +14,7 @@ uses
   {Messages,} SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, {ComCtrls,} ExtCtrls, StdCtrls, inifiles, Spin, {FileCtrl,}
   Menus, Buttons, EditBtn, uLocalization, DateTimePicker,
-  LCLIntf, ScreenGrabber, uHotKeysForm, uUtilsMore, GlobalKeyHook,
+  LCLIntf, ComCtrls, ScreenGrabber, uHotKeysForm, uUtilsMore, GlobalKeyHook,
   OldScreenshotCleaner, UniqueInstance, uplaysound, ZStream { for Tcompressionlevel };
 
 type
@@ -65,9 +65,10 @@ type
     CheckForUpdatesMenuItem: TMenuItem;
     OutputDirEdit: TDirectoryEdit;
     SkipSimilarMatchPercentSpinEdit: TSpinEdit;
-    Timer: TTimer;
     OutputDirLabel: TLabel;
     CaptureIntervalLabel: TLabel;
+    AutoCaptureUpdaterTimer: TTimer;
+    StatusBar1: TStatusBar;
     TrayIcon: TTrayIcon;
     ImageFormatLabel: TLabel;
     TakeScreenshotButton: TButton;
@@ -111,6 +112,7 @@ type
     SeqNumberDigitsCountSpinEdit: TSpinEdit;
     SeqNumberDigitsCountLabel: TLabel;
     UniqueInstance1: TUniqueInstance;
+    procedure AutoCaptureUpdaterTimerTimer(Sender: TObject);
     procedure CheckForUpdatesMenuItemClick(Sender: TObject);
     procedure AutoCheckForUpdatesMenuItemClick(Sender: TObject);
     procedure CompressionLevelComboBoxChange(Sender: TObject);
@@ -195,6 +197,8 @@ type
     public
     FileJournal: TFileJournal;
     private
+
+    AutoCaptureTimer: TTimerV2;
     
     { Methods }
     procedure SetTimerEnabled(AEnabled: Boolean);
@@ -270,6 +274,8 @@ type
     function GetSkipSimilar: Boolean;
     procedure SetSkipSimilarMatchPercent(AVal: Integer);
     function GetSkipSimilarMatchPercent: Integer;
+
+    procedure UpdateStatusBar;
 
 
     { Properties }
@@ -419,6 +425,10 @@ begin
       Append('');
   end;
 
+  // Fix incorrect order for statusbar and panel with buttons
+  // https://wiki.lazarus.freepascal.org/Autosize_/_Layout#Order_of_controls_with_same_Align
+  ButtonsPanel.Top:=0;
+  StatusBar1.Top:=999;
 end;
 
 procedure TMainForm.ReadSettings;
@@ -535,7 +545,7 @@ begin
   end;
 
   // Start autocapture
-  Timer.Interval := SecondOfTheDay(CaptureIntervalDateTimePicker.Time) * MSecsPerSec;
+  AutoCaptureTimer.Interval := SecondOfTheDay(CaptureIntervalDateTimePicker.Time) * MSecsPerSec;
   StartCaptureOnStartUpCheckBox.Checked :=
       Ini.ReadBool(DefaultConfigIniSection, 'StartCaptureOnStartUp', {True} False);
   IsTimerEnabled := StartCaptureOnStartUpCheckBox.Checked;
@@ -606,6 +616,10 @@ var
   HotKey: THotKey;
   IniFileName: String;
 begin
+  AutoCaptureTimer := TTimerV2.Create(Self);
+  AutoCaptureTimer.Enabled:=False;
+  AutoCaptureTimer.OnTimer:=@TimerTimer;
+
   {DebugLn('Program started');
   DebugLn('Version: ', GetProgramVersionStr);
   DebugLn('Initializing...');}
@@ -696,6 +710,11 @@ end;
 procedure TMainForm.CheckForUpdatesMenuItemClick(Sender: TObject);
 begin
   CheckForUpdates(False);
+end;
+
+procedure TMainForm.AutoCaptureUpdaterTimerTimer(Sender: TObject);
+begin
+  UpdateStatusBar;
 end;
 
 procedure TMainForm.AutoCheckForUpdatesMenuItemClick(Sender: TObject);
@@ -831,7 +850,7 @@ begin
     CaptureIntervalDateTimePicker.Time := IncSecond(CaptureIntervalDateTimePicker.Time, Seconds);
   end;
   Ini.WriteFloat(DefaultConfigIniSection, 'CaptureInterval', Seconds / SecsPerMin);
-  Timer.Interval := Seconds * MSecsPerSec;
+  AutoCaptureTimer.Interval := Seconds * MSecsPerSec;
 end;
 
 procedure TMainForm.PlaySoundsCheckBoxChange(Sender: TObject);
@@ -867,11 +886,11 @@ begin
     // ToDo: May add comparision of current screenshot with the last one,
     // and if they equal, do not save current
 
-    if Timer.Interval > UserIdleTime then
+    if AutoCaptureTimer.Interval > UserIdleTime then
       MakeScreenshot
     else
       DebugLn('Automatic capture skipped (Timer.Interval=%d, UserIdleTime=%d)',
-          [Timer.Interval, UserIdleTime]);
+          [AutoCaptureTimer.Interval, UserIdleTime]);
   end
   else
     MakeScreenshot;
@@ -879,12 +898,12 @@ end;
 
 function TMainForm.GetTimerEnabled: Boolean;
 begin
-  Result := Timer.Enabled;
+  Result := AutoCaptureTimer.Enabled;
 end;
 
 procedure TMainForm.SetTimerEnabled(AEnabled: Boolean);
 begin
-  Timer.Enabled := AEnabled;
+  AutoCaptureTimer.Enabled := AEnabled;
   StartAutoCaptureButton.Enabled := not AEnabled;
   StopAutoCaptureButton.Enabled := AEnabled;
   // Tray menu
@@ -903,6 +922,9 @@ begin
     else
       PlaySound('stop.wav');
   end;
+
+  // Update statusbar
+  UpdateStatusBar;
 
   if AEnabled then
     DebugLn('Automatic capture started')
@@ -946,7 +968,7 @@ begin
     begin
       DebugLn('Execution failed: ', E.ToString);
 
-      if not Timer.Enabled then // Manual capture
+      if not AutoCaptureTimer.Enabled then // Manual capture
       begin
         ErrMsg := {'Execution of custom command failed: ' +} E.Message;
         MessageDlg('Auto Screenshot', ErrMsg, mtWarning, [mbOK], '');
@@ -999,7 +1021,7 @@ begin
     begin
       DebugLn('Execution failed: ', E.ToString);
 
-      if not Timer.Enabled then // Manual capture
+      if not AutoCaptureTimer.Enabled then // Manual capture
       begin
         ErrMsg := {'Execution of custom command failed: ' +} E.Message;
         MessageDlg('Auto Screenshot', ErrMsg, mtWarning, [mbOK], '');
@@ -2179,6 +2201,32 @@ end;
 function TMainForm.GetSkipSimilarMatchPercent: Integer;
 begin
   Result := SkipSimilarMatchPercentSpinEdit.Value;
+end;
+
+procedure TMainForm.UpdateStatusBar;
+var
+  Sec: Integer;
+begin
+  if not IsTimerEnabled then
+    StatusBar1.SimpleText:=''
+  else
+  begin
+    if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
+    begin  // user inactive
+      StatusBar1.SimpleText := Localizer.I18N('AutoCapturePaused');
+    end
+    else   // show next run time
+    begin
+      Sec := AutoCaptureTimer.SecondsBeforeNextExecution;
+      if Sec < 0 then
+        StatusBar1.SimpleText := ''
+      else
+      begin
+        //Text := Format('Next shot after %d seconds', [Sec]);
+        StatusBar1.SimpleText := Format(Localizer.I18N('TimeToNextShot'), [SecondsToHMS(Sec)]);
+      end;
+    end;
+  end;
 end;
 
 {$IfDef Windows}

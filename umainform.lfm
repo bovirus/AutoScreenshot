@@ -18,7 +18,7 @@ object MainForm: TMainForm
   LCLVersion = '2.2.4.0'
   object SettingsPanel: TPanel
     Left = 0
-    Height = 566
+    Height = 542
     Top = 0
     Width = 723
     Align = alClient
@@ -29,7 +29,7 @@ object MainForm: TMainForm
     ChildSizing.VerticalSpacing = 6
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 2
-    ClientHeight = 566
+    ClientHeight = 542
     ClientWidth = 723
     TabOrder = 0
     object OutputDirLabel: TLabel
@@ -718,7 +718,7 @@ object MainForm: TMainForm
       ChildSizing.HorizontalSpacing = 6
       ChildSizing.VerticalSpacing = 6
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 2
+      ChildSizing.ControlsPerLine = 3
       ClientHeight = 40
       ClientWidth = 218
       TabOrder = 1
@@ -728,6 +728,7 @@ object MainForm: TMainForm
         Top = 6
         Width = 100
         AutoSize = True
+        BorderSpacing.CellAlignVertical = ccaCenter
         Caption = 'Enable'
         Constraints.MinWidth = 100
         NumGlyphs = 2
@@ -741,6 +742,7 @@ object MainForm: TMainForm
         Top = 6
         Width = 100
         AutoSize = True
+        BorderSpacing.CellAlignVertical = ccaCenter
         Caption = 'Disable'
         Constraints.MinWidth = 100
         NumGlyphs = 2
@@ -750,11 +752,12 @@ object MainForm: TMainForm
       end
     end
   end
-  object Timer: TTimer
-    Enabled = False
-    OnTimer = TimerTimer
-    Left = 16
-    Top = 124
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 24
+    Top = 542
+    Width = 723
+    Panels = <>
   end
   object TrayIcon: TTrayIcon
     PopUpMenu = TrayIconPopupMenu
@@ -883,5 +886,10 @@ object MainForm: TMainForm
       189AFE2FE8F663B33332F2334EFB81E190874F7F7CFC6738BBB7F71B9A9BDE65
       23C2FFC373E2C3FFC37358F88FF4D40B000A99311F
     }
+  end
+  object AutoCaptureUpdaterTimer: TTimer
+    OnTimer = AutoCaptureUpdaterTimerTimer
+    Left = 281
+    Top = 133
   end
 end
