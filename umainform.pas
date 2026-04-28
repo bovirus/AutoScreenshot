@@ -2213,7 +2213,7 @@ begin
   begin
     if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
     begin  // user inactive
-      StatusBar1.SimpleText := 'Automatic capture paused due to user inactivity';
+      StatusBar1.SimpleText := Localizer.I18N('AutoCapturePaused');
     end
     else   // show next run time
     begin
@@ -2223,7 +2223,7 @@ begin
       else
       begin
         //Text := Format('Next shot after %d seconds', [Sec]);
-        StatusBar1.SimpleText := Format('Next shot after %s', [SecondsToHMS(Sec)]);
+        StatusBar1.SimpleText := Format(Localizer.I18N('TimeToNextShot'), [SecondsToHMS(Sec)]);
       end;
     end;
   end;
