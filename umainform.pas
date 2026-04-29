@@ -18,7 +18,7 @@ uses
   OldScreenshotCleaner, UniqueInstance, uplaysound, ZStream { for Tcompressionlevel };
 
 type
-  TTrayIconState = (tisDefault, tisBlackWhite, tisFlashAnimation);
+  TTrayIconState = (tisDefault, tisBlackWhite, tisFlashAnimation, tisUserIdle);
 
   { TMainForm }
 
@@ -718,6 +718,14 @@ const
   DefaultTimeout = 1000;
 begin
   UpdateStatusBar;
+
+  if IsTimerEnabled then
+  begin
+    if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
+      TrayIconState := tisUserIdle // user idle
+    else if {TrayIconState} FTrayIconState = tisUserIdle then
+      TrayIconState := tisDefault;
+  end;
 
   // reset update interval to defaut value
   if (Sender as TTimer).Interval <> DefaultTimeout then
@@ -1573,7 +1581,8 @@ begin
         TrayIconIdx := Low(TrayIconIdx);
         TrayIconAnimationTimer.Enabled := True;
         ResName := Format('_CAMERA_FLASH_%d', [TrayIconIdx]);
-      end
+      end;
+    tisUserIdle: ResName := '_CAMERA_USER_IDLE'
     //tisDefault:
     else ResName := '_CAMERA';
   end;
