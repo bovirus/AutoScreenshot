@@ -275,7 +275,7 @@ type
     procedure SetSkipSimilarMatchPercent(AVal: Integer);
     function GetSkipSimilarMatchPercent: Integer;
 
-    procedure UpdateStatusBar;
+    procedure UpdateStatusBarAndTrayIconText;
     procedure ShowNotificationInStatusBar(AMsg: string);
 
 
@@ -717,7 +717,7 @@ procedure TMainForm.AutoCaptureUpdaterTimerTimer(Sender: TObject);
 const
   DefaultTimeout = 1000;
 begin
-  UpdateStatusBar;
+  UpdateStatusBarAndTrayIconText;
 
   if IsTimerEnabled then
   begin
@@ -939,7 +939,7 @@ begin
   end;
 
   // Update statusbar
-  UpdateStatusBar;
+  UpdateStatusBarAndTrayIconText;
 
   if AEnabled then
     DebugLn('Automatic capture started')
@@ -2226,10 +2226,12 @@ begin
   Result := SkipSimilarMatchPercentSpinEdit.Value;
 end;
 
-procedure TMainForm.UpdateStatusBar;
+procedure TMainForm.UpdateStatusBarAndTrayIconText;
 var
   Sec: Integer;
 begin
+  TrayIcon.Hint := Application.Title;
+
   if not IsTimerEnabled then
     StatusBar1.SimpleText:=''
   else
@@ -2247,6 +2249,7 @@ begin
       begin
         //Text := Format('Next shot after %d seconds', [Sec]);
         StatusBar1.SimpleText := Format(Localizer.I18N('TimeToNextShot'), [SecondsToHMS(Sec)]);
+        TrayIcon.Hint := Format('%s - %s', [Application.Title, StatusBar1.SimpleText]);
       end;
     end;
   end;
