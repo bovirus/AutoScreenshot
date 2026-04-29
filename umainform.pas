@@ -276,6 +276,7 @@ type
     function GetSkipSimilarMatchPercent: Integer;
 
     procedure UpdateStatusBar;
+    procedure ShowNotificationInStatusBar(AMsg: string);
 
 
     { Properties }
@@ -713,8 +714,14 @@ begin
 end;
 
 procedure TMainForm.AutoCaptureUpdaterTimerTimer(Sender: TObject);
+const
+  DefaultTimeout = 1000;
 begin
   UpdateStatusBar;
+
+  // reset update interval to defaut value
+  if (Sender as TTimer).Interval <> DefaultTimeout then
+    (Sender as TTimer).Interval := DefaultTimeout;
 end;
 
 procedure TMainForm.AutoCheckForUpdatesMenuItemClick(Sender: TObject);
@@ -950,6 +957,7 @@ end;
 procedure TMainForm.MakeScreenshot;
 var
   Cmd, ImageFileName, ErrMsg, LastImgFileName: String;
+  SimilarSkipped: Boolean = false;
 begin
   ImageFileName := ImagePath; // Use local variable because ImagePath() result
                               // may be changed on next call
@@ -992,12 +1000,14 @@ begin
   LastImgFileName := FileJournal.LastAdded;
   //FileJournal.Add(ImageFileName);
 
+  SimilarSkipped:=False;
   If SkipSimilar and (LastImgFileName <> '') then
   begin
     if ImagesEqual(LastImgFileName, ImageFileName, SkipSimilarMatchPercent) then
     begin
       DeleteFile(ImageFileName);
       DebugLn('Skip similar screenshot (%s ~ %s)', [LastImgFileName, ImageFileName]);
+      SimilarSkipped:=True;
     end
     else
       FileJournal.Add(ImageFileName);
@@ -1005,6 +1015,10 @@ begin
   else
     FileJournal.Add(ImageFileName);
 
+  if SimilarSkipped then
+    ShowNotificationInStatusBar(Localizer.I18N('ScreenshotSkipped'))
+  else
+    ShowNotificationInStatusBar(Format(Localizer.I18N('ScreenshotSaved'), [ImageFileName]));
 
   // Run user command after screenshot
   try
@@ -2227,6 +2241,12 @@ begin
       end;
     end;
   end;
+end;
+
+procedure TMainForm.ShowNotificationInStatusBar(AMsg: string);
+begin
+  StatusBar1.SimpleText:=amsg;
+  AutoCaptureUpdaterTimer.Interval:=3000; // prevent immediately text rewrite by timer
 end;
 
 {$IfDef Windows}
