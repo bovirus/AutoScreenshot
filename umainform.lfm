@@ -51,33 +51,31 @@ object MainForm: TMainForm
       AutoSize = True
       BevelOuter = bvNone
       ChildSizing.HorizontalSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 999
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.Layout = cclTopToBottomThenLeftToRight
       ClientHeight = 28
       ClientWidth = 856
       TabOrder = 0
       object OutputDirEdit: TDirectoryEdit
         Left = 0
-        Height = 28
-        Top = 0
-        Width = 750
+        Height = 26
+        Top = 1
+        Width = 575
         ShowHidden = False
         ButtonWidth = 23
         Constraints.MinWidth = 400
         NumGlyphs = 1
-        Align = alClient
         BorderSpacing.CellAlignVertical = ccaCenter
         MaxLength = 0
         TabOrder = 0
         OnChange = OutputDirEditChange
       end
       object OpenOutputDirButton: TButton
-        Left = 756
+        Left = 581
         Height = 28
         Top = 0
-        Width = 100
-        Align = alRight
+        Width = 275
         AutoSize = True
         BorderSpacing.CellAlignVertical = ccaCenter
         Caption = 'Open directory'
@@ -109,8 +107,7 @@ object MainForm: TMainForm
       ChildSizing.HorizontalSpacing = 6
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.ShrinkHorizontal = crsHomogenousChildResize
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 999
+      ChildSizing.Layout = cclTopToBottomThenLeftToRight
       ClientHeight = 28
       ClientWidth = 856
       TabOrder = 1
@@ -126,7 +123,6 @@ object MainForm: TMainForm
         TabOrder = 0
       end
       object FileNameTemplateHelpButton: TButton
-        AnchorSideLeft.Side = asrBottom
         Left = 841
         Height = 28
         Top = 0
