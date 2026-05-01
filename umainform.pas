@@ -124,7 +124,6 @@ type
     procedure OldScreenshotCleanerEnabledCheckBoxChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure HotKetsSettingsMenuItemClick(Sender: TObject);
     procedure DonateMenuItemClick(Sender: TObject);
     procedure OldScreenshotCleanerMaxAgeUnitComboBoxChange(Sender: TObject);
@@ -228,8 +227,6 @@ type
     procedure LanguageClick(Sender: TObject);
     function GetLangCodeOfLangMenuItem(const LangItem: TMenuItem): TLanguageCode;
     function FindLangMenuItem(ALangCode: TLanguageCode): TMenuItem;
-    procedure RecalculateLabelWidths;
-    procedure RecalculateLabelWidthsForSeqNumGroup;
     function FormatPath(Str: string): string;
     procedure SetCounter(Val: Integer);
     procedure SetCounterDigits(Val: Integer);
@@ -797,11 +794,6 @@ begin
   DebugLn('Program ended');
 end;
 
-procedure TMainForm.FormShow(Sender: TObject);
-begin
-  RecalculateLabelWidths;
-end;
-
 procedure TMainForm.HotKetsSettingsMenuItemClick(Sender: TObject);
 var
   HotKeysForm: THotKeysForm;
@@ -1353,9 +1345,6 @@ begin
   finally
     EnableAutoSizing;
 
-    // Recalculate with of labels area
-    RecalculateLabelWidths;
-
     UpdateFormAutoSize;
   end;
 end;
@@ -1801,41 +1790,6 @@ begin
   raise Exception.CreateFmt('Language code "%s" not found', [ALangCode]);
 end;
 
-procedure TMainForm.RecalculateLabelWidths;
-var
-  MaxWidth: Integer;
-begin
-  MaxWidth := MaxValue([
-    OutputDirLabel.Width,
-    FileNameTemplateLabel.Width,
-    CaptureIntervalLabel.Width,
-    ImageFormatLabel.Width,
-    MonitorLabel.Width,
-    PostCmdLabel.Width,
-    PreCmdLabel.Width
-  ]);
-
-  OutputDirEdit.Left := MaxWidth + OutputDirEdit.Parent.ChildSizing.LeftRightSpacing
-      + OutputDirEdit.Parent.ChildSizing.HorizontalSpacing;
-
-  // Sequential number group
-  RecalculateLabelWidthsForSeqNumGroup;
-end;
-
-procedure TMainForm.RecalculateLabelWidthsForSeqNumGroup;
-var
-  MaxWidth: Integer;
-begin
-  MaxWidth := MaxValue([
-    SeqNumberValueLabel.Width,
-    SeqNumberDigitsCountLabel.Width
-  ]);
-
-  SeqNumberValueSpinEdit.Left := MaxWidth
-      + SeqNumberGroup.ChildSizing.LeftRightSpacing
-      + SeqNumberGroup.ChildSizing.HorizontalSpacing;
-end;
-
 function TMainForm.GetLangCodeOfLangMenuItem(
   const LangItem: TMenuItem): TLanguageCode;
 begin
@@ -1893,8 +1847,6 @@ procedure TMainForm.UpdateSeqNumGroupVisibility;
 begin
   SeqNumberGroup.Visible := Pos('%NUM', FileNameTemplateComboBox.Text) <> 0;
   EmptyLabel1.Visible := SeqNumberGroup.Visible;
-  if SeqNumberGroup.Visible then
-    RecalculateLabelWidthsForSeqNumGroup;
 
   UpdateFormAutoSize;
 end;

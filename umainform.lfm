@@ -13,7 +13,6 @@ object MainForm: TMainForm
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '2.2.4.0'
   object SettingsPanel: TPanel
@@ -155,54 +154,54 @@ object MainForm: TMainForm
       ChildSizing.TopBottomSpacing = 6
       ChildSizing.HorizontalSpacing = 6
       ChildSizing.VerticalSpacing = 6
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
       ClientHeight = 70
       ClientWidth = 854
+      ParentBackground = False
+      ParentColor = False
       TabOrder = 2
       object SeqNumberValueLabel: TLabel
-        AnchorSideTop.Control = SeqNumberValueSpinEdit
-        AnchorSideTop.Side = asrCenter
-        AnchorSideRight.Control = SeqNumberValueSpinEdit
-        Left = 857
+        Left = 6
         Height = 16
         Top = 11
         Width = 68
         Alignment = taRightJustify
-        Anchors = [akTop, akRight]
+        BorderSpacing.CellAlignVertical = ccaCenter
         Caption = 'Next value:'
         ParentColor = False
       end
-      object SeqNumberDigitsCountLabel: TLabel
-        AnchorSideTop.Control = SeqNumberDigitsCountSpinEdit
-        AnchorSideTop.Side = asrCenter
-        AnchorSideRight.Control = SeqNumberDigitsCountSpinEdit
-        Left = 887
-        Height = 16
-        Top = 43
-        Width = 38
-        Alignment = taRightJustify
-        Anchors = [akTop, akRight]
-        Caption = 'Digits:'
-        ParentColor = False
-      end
       object SeqNumberValueSpinEdit: TSpinEdit
-        AnchorSideTop.Control = SeqNumberGroup
-        Left = 931
+        Left = 80
         Height = 26
         Top = 6
-        Width = 73
-        Anchors = [akTop]
+        Width = 80
+        BorderSpacing.CellAlignHorizontal = ccaLeftTop
+        BorderSpacing.CellAlignVertical = ccaCenter
+        Constraints.MinWidth = 80
         MaxValue = 999999
         OnChange = SeqNumberValueSpinEditChange
         TabOrder = 0
       end
+      object SeqNumberDigitsCountLabel: TLabel
+        AnchorSideRight.Control = SeqNumberDigitsCountSpinEdit
+        Left = 6
+        Height = 16
+        Top = 43
+        Width = 68
+        Alignment = taRightJustify
+        BorderSpacing.CellAlignVertical = ccaCenter
+        Caption = 'Digits:'
+        ParentColor = False
+      end
       object SeqNumberDigitsCountSpinEdit: TSpinEdit
-        AnchorSideLeft.Control = SeqNumberValueSpinEdit
-        AnchorSideTop.Control = SeqNumberValueSpinEdit
-        AnchorSideTop.Side = asrBottom
-        Left = 931
+        Left = 80
         Height = 26
         Top = 38
-        Width = 49
+        Width = 50
+        BorderSpacing.CellAlignHorizontal = ccaLeftTop
+        BorderSpacing.CellAlignVertical = ccaCenter
+        Constraints.MinWidth = 50
         OnChange = SeqNumberDigitsCountSpinEditChange
         TabOrder = 1
       end
