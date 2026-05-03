@@ -162,6 +162,7 @@
 		</if>-->
 	</target>
 	
+	<!--  -->
 	<target name="download_ssl_dlls" depends="check_ssl_dlls_checksum, init" unless="${ssl_dlls.checksum_is_ok}" if="is_windows">
 		<echo>Start download OpenSSL binaries archive</echo>
 		<tempfile property="zip_temp_file" prefix="openssl_" suffix=".zip" destdir="${temp_dir}" deleteonexit="true"/>
@@ -196,5 +197,56 @@
 			</and>
 		</condition>
 		<echo>SSL dll checksums are valid: ${ssl_dlls.checksum_is_ok}</echo>
+	</target>
+	<!--  -->
+	
+	<target name="delete_dlls">
+		<delete>
+			<fileset dir="${basedir}" includes="/*.dll"/>
+		</delete>
+	</target>
+	
+	<target name="download_dlls" depends="delete_dlls" description="Download all required dlls to project main directory (Windows only)">
+		<tempfile property="temp.zip" suffix=".zip" prefix="autoscreenshot_dlls_" deleteonexit="true" destDir="${java.io.tmpdir}" />
+		<echo>Temp dir: ${temp.zip}</echo>
+		
+		<!-- SQLite -->
+		<get src="https://sqlite.org/2024/sqlite-dll-win-x86-3450300.zip" dest="${temp.zip}" verbose="true"/>
+		<!--<get src="https://sqlite.org/2026/sqlite-dll-win-x86-3530000.zip" dest="${temp.zip}" verbose="true"/>-->
+		<unzip src="${temp.zip}" dest="${basedir}">
+			<patternset>
+				<include name="/sqlite3.dll"/>
+			</patternset>
+		</unzip>
+		
+		<!-- OpenSSL -->
+		<get src="https://github.com/IndySockets/OpenSSL-Binaries/raw/refs/heads/master/Archive/openssl-1.0.2j-i386-win32.zip" dest="${temp.zip}" verbose="true"/>
+		<!--<get src="https://github.com/IndySockets/OpenSSL-Binaries/raw/refs/heads/master/openssl-1.0.2u-i386-win32.zip" dest="${temp.zip}" verbose="true"/>-->
+		<unzip src="${temp.zip}" dest="${basedir}">
+			<patternset>
+				<include name="/ssleay32.dll"/>
+				<include name="/libeay32.dll"/>
+			</patternset>
+		</unzip>
+		
+		<!-- WebP -->
+		<get src="https://github.com/bgrabitmap/webp/raw/refs/heads/master/bgrawebp/libwebp32.dll" dest="${basedir}" verbose="true"/>
+		
+		<!-- AVIF -->
+		<get src="https://github.com/bgrabitmap/bgrabitmap/files/8793166/libavifDlls_0.10.1-1.zip" dest="${temp.zip}" verbose="true"/>
+		<!--<get src="https://github.com/bgrabitmap/bgrabitmap/files/12566323/libavif_windows_dlls_ver_1_0_1-1.zip" dest="${temp.zip}" verbose="true"/>-->
+		<unzip src="${temp.zip}" dest="${basedir}">
+			<patternset>
+				<!--<include name="/windows32bits/*.dll"/>-->
+				
+				<include name="/windows32bits/rav1e.dll"/>
+				<include name="/windows32bits/libwinpthread-1.dll"/>
+				<include name="/windows32bits/libgcc_s_dw2-1.dll"/>
+				<include name="/windows32bits/libdav1d.dll"/>
+				<include name="/windows32bits/libavif.dll"/>
+				<include name="/windows32bits/libaom.dll"/>
+			</patternset>
+			<cutdirsmapper dirs="1" />
+		</unzip>
 	</target>
 </project>
