@@ -84,7 +84,7 @@
 	
 	<target name="build" depends="init" description="Compile executable">
 		<echo>Compile executable</echo>
-		<exec executable="${lazbuild_path}">
+		<exec executable="${lazbuild_path}" failifexecutionfails="true" failonerror="true">
 			<arg value="--build-mode=${build_mode}"/>
 			<!--<arg value="- - verbose"/>-->
 			<arg value="AutoScreenshot.lpi"/>
@@ -93,7 +93,7 @@
 	
 	<target name="build_tests">
 		<echo>Compile tests</echo>
-		<exec executable="${lazbuild_path}" dir="${test_dir}">
+		<exec executable="${lazbuild_path}" dir="${test_dir}" failifexecutionfails="true" failonerror="true">
 			<arg value="AutoScreenshotTest.lpi"/>
 		</exec>
 	</target>
