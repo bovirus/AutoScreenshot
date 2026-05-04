@@ -2185,7 +2185,10 @@ begin
   TrayIcon.Hint := Application.Title;
 
   if not IsTimerEnabled then
-    StatusBar1.SimpleText:=''
+  begin
+    StatusBar1.SimpleText:='';
+    TrayIcon.Hint := Format('%s - %s', [Application.Title, Localizer.I18N('AutoCaptureDisabled')]);
+  end
   else
   begin
     if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
