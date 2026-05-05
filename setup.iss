@@ -61,7 +61,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "AutoScreenshot.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "lang\*"; DestDir: "{app}\lang"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.bak"
+Source: "lang\*.ini"; DestDir: "{app}\lang"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.bak"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 ; ToDo: Remove config.ini when uninstall or make this optional
 Source: "ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion
