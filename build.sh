@@ -1,3 +1,3 @@
 #!/bin/bash
-ant zip #deb
+ant -Darch=x64 zip #deb
 
