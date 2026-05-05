@@ -7,6 +7,8 @@
 #define MyAppPublisher "Artem Demin"
 #define MyAppURL       "https://github.com/artem78/AutoScreenshot#readme"
 #define CurrentYear    GetDateTimeString('yyyy','','')
+#define X86Dir         "build\x86_files"
+#define X64Dir         "build\x64_files"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -46,6 +48,15 @@ OutputBaseFilename=AutoScreenshot_v{#MyAppVersion}_Windows_setup
 Compression=lzma
 SolidCompression=yes
 
+; "ArchitecturesInstallIn64BitMode=x64" requests that the install be
+; done in "64-bit mode" on x64, meaning it should use the native
+; 64-bit Program Files directory and the 64-bit view of the registry.
+; On all other architectures it will install in "32-bit mode".
+ArchitecturesInstallIn64BitMode=x64
+; Note: We don't set ProcessorsAllowed because we want this
+; installation to run on all architectures (including Itanium,
+; since it's capable of running 32-bit code too).
+
 [Languages]
 Name: "english";   MessagesFile: "compiler:Default.isl"
 Name: "french";    MessagesFile: "compiler:Languages\French.isl"
@@ -60,21 +71,41 @@ Name: "Ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "AutoScreenshot.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "lang\*.ini"; DestDir: "{app}\lang"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "*.bak"
+; Install MyProg-x64.exe if running in 64-bit mode (x64; see above),
+; MyProg.exe otherwise.
+
+; Place all x64 files here
+Source: "{#X64Dir}\AutoScreenshot.exe";  DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\ssleay32.dll";        DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\libeay32.dll";        DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\sqlite3.dll";         DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\libwebp64.dll";       DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\libgcc_s_seh-1.dll";  DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\libaom.dll";          DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\libavif.dll";         DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\libdav1d.dll";        DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+Source: "{#X64Dir}\rav1e.dll";           DestDir: "{app}"; Flags: ignoreversion; Check: Is64BitInstallMode;
+
+; Place all x86 files here, first one should be marked 'solidbreak'
+Source: "{#X86Dir}\AutoScreenshot.exe";  DestDir: "{app}"; Flags: ignoreversion solidbreak; Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\ssleay32.dll";        DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\libeay32.dll";        DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\sqlite3.dll";         DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\libwebp32.dll";       DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\libgcc_s_dw2-1.dll";  DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\libaom.dll";          DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\libavif.dll";         DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\libdav1d.dll";        DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+Source: "{#X86Dir}\rav1e.dll";           DestDir: "{app}"; Flags: ignoreversion;            Check: not Is64BitInstallMode;
+
+; Place all common files here, first one should be marked 'solidbreak'
+Source: "lang\*.ini";   DestDir: "{app}\lang";   Flags: ignoreversion recursesubdirs createallsubdirs solidbreak; Excludes: "*.bak"
+Source: "sounds\*.wav"; DestDir: "{app}\sounds"; Flags: ignoreversion recursesubdirs createallsubdirs
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 ; ToDo: Remove config.ini when uninstall or make this optional
-Source: "ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "libeay32.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "sounds\*.wav"; DestDir: "{app}\sounds"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "sqlite3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "libwebp32.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "libaom.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "libavif.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "libdav1d.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "libgcc_s_dw2-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "rav1e.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

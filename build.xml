@@ -27,6 +27,8 @@
 	
 	<!--<property name="build_dir" location="build"/>-->
 	<property name="build_dir" location="build/files"/>
+	<property name="build_x86_dir" location="build/x86_files"/>
+	<property name="build_x64_dir" location="build/x64_files"/>
 	<property name="releases_dir" location="releases"/>
 	<property name="zip_dir" location="build/zip"/>
 	<property name="test_dir" location="Test"/>
@@ -58,6 +60,8 @@
 	<!-- Targets: -->
 	<target name="clean">
 		<delete dir="${build_dir}"/>
+		<delete dir="${build_x86_dir}"/>
+		<delete dir="${build_x86_dir}"/>
 		<delete dir="lib"/>
 		<delete file="${executable}"/>
 		<delete dir="${temp_dir}"/>
@@ -191,10 +195,38 @@
 		<zip basedir="${temp_dir}" destfile="${zip_dir}/AutoScreenshot_${version}_${os_family}_${arch}_portable.zip" level="9"/>
 	</target>
 	
-	<target name="installer" depends="download_dlls, build, tests" description="Make installer file (Windows only)" if="is_windows">
+	<!--<target name="installer" depends="download_dlls, build, tests" description="Make installer file (Windows only)" if="is_windows">-->
+	<target name="installer" description="Make installer file (Windows only)" if="is_windows">
+		<!--<echoproperties/>-->
 		<!--<if>
 			<os family="windows"/>
 			<then>-->
+		
+				<!-- Prepare files for x86 -->
+				<antcall target="download_dlls">
+					<param name="arch" value="x86"/>
+				</antcall>
+				<copy todir="${build_x86_dir}">
+					<fileset dir="${basedir}" includes="/*.dll"/>
+				</copy>
+				<antcall target="build">
+					<param name="arch" value="x86"/>
+				</antcall>
+				<copy file="${basedir}/AutoScreenshot.exe" todir="${build_x86_dir}" failonerror="true" />
+				
+				<!-- Prepare files for x64 -->
+				<antcall target="download_dlls">
+					<param name="arch" value="x64"/>
+				</antcall>
+				<copy todir="${build_x64_dir}">
+					<fileset dir="${basedir}" includes="/*.dll"/>
+				</copy>
+				<antcall target="build">
+					<param name="arch" value="x64"/>
+				</antcall>
+				<copy file="${basedir}/AutoScreenshot.exe" todir="${build_x64_dir}" failonerror="true" />
+		
+				<!-- Run Inno Setup script compiling -->
 				<exec executable="${inno_setup_dir}/ISCC.exe" failonerror="true">
 					<!--<env key="LazarusDir" value="${lazarus_dir}"/>-->
 					<arg value="/DRevision=${version}"/>
