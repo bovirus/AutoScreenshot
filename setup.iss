@@ -3,9 +3,10 @@
 
 #define MyAppName      "Auto Screenshot"
 #define MyAppExeName   "AutoScreenshot.exe"
+#define MyAppRevision   Revision
 #define MyAppVersion    GetFileProductVersion("AutoScreenshot.exe")
 #define MyAppPublisher "Artem Demin"
-#define MyAppURL       "https://github.com/artem78/AutoScreenshot#readme"
+#define MyAppURL       "https://artem78.github.io/AutoScreenshot/"
 #define CurrentYear    GetDateTimeString('yyyy','','')
 #define X86Dir         "build\x86_files"
 #define X64Dir         "build\x64_files"
@@ -44,7 +45,7 @@ DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
 LicenseFile=LICENSE.rtf
 OutputDir=build\setup
-OutputBaseFilename=AutoScreenshot_v{#MyAppVersion}_Windows_setup
+OutputBaseFilename=AutoScreenshot_{#MyAppRevision}_Windows_setup
 Compression=lzma
 SolidCompression=yes
 
