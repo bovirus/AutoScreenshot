@@ -44,6 +44,9 @@ type
     procedure GithubValueLabelClick(Sender: TObject);
     procedure GithubValueLabelMouseEnter(Sender: TObject);
     procedure GithubValueLabelMouseLeave(Sender: TObject);
+    procedure LicenseValueLabelClick(Sender: TObject);
+    procedure LicenseValueLabelMouseEnter(Sender: TObject);
+    procedure LicenseValueLabelMouseLeave(Sender: TObject);
     procedure LinkValueLabelClick(Sender: TObject);
     procedure LinkValueLabelMouseEnter(Sender: TObject);
     procedure LinkValueLabelMouseLeave(Sender: TObject);
@@ -67,6 +70,7 @@ const
   ProjectURL = ProjectURLTitle + '?fromApp';
   AuthorMail = 'megabyte1024@ya.ru';
   ProjectGithubUrl = 'https://github.com/artem78/AutoScreenshot';
+  LicenseUrl = ProjectGithubUrl + '/blob/master/LICENSE.txt';
 
 procedure TAboutForm.FormCreate(Sender: TObject);
 const
@@ -165,6 +169,21 @@ begin
 end;
 
 procedure TAboutForm.GithubValueLabelMouseLeave(Sender: TObject);
+begin
+  (Sender as TLabel).Font.Style := (Sender as TLabel).Font.Style - [fsUnderline];
+end;
+
+procedure TAboutForm.LicenseValueLabelClick(Sender: TObject);
+begin
+  OpenURL(LicenseUrl);
+end;
+
+procedure TAboutForm.LicenseValueLabelMouseEnter(Sender: TObject);
+begin
+  (Sender as TLabel).Font.Style := (Sender as TLabel).Font.Style + [fsUnderline];
+end;
+
+procedure TAboutForm.LicenseValueLabelMouseLeave(Sender: TObject);
 begin
   (Sender as TLabel).Font.Style := (Sender as TLabel).Font.Style - [fsUnderline];
 end;

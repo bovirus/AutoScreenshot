@@ -188,12 +188,18 @@ object AboutForm: TAboutForm
       ParentColor = False
     end
     object LicenseValueLabel: TLabel
+      Cursor = crHandPoint
       Left = 87
       Height = 15
       Top = 105
       Width = 62
       Caption = 'XXX'
+      Font.Color = clBlue
       ParentColor = False
+      ParentFont = False
+      OnClick = LicenseValueLabelClick
+      OnMouseEnter = LicenseValueLabelMouseEnter
+      OnMouseLeave = LicenseValueLabelMouseLeave
     end
     object LinkTitleLabel: TLabel
       Left = 0
