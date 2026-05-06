@@ -34,6 +34,7 @@ type
     EmptyLabel9: TLabel;
     Label1: TLabel;
     Label2: TLabel;
+    HelpWithTranslationMenuItem: TMenuItem;
     SkipSimilarPanel: TPanel;
     SkipSimilarCheckBox: TCheckBox;
     FileMenuItem: TMenuItem;
@@ -118,6 +119,7 @@ type
     procedure CompressionLevelComboBoxChange(Sender: TObject);
     procedure ExitMenuItemClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure HelpWithTranslationMenuItemClick(Sender: TObject);
     procedure HomePageMenuItemClick(Sender: TObject);
     procedure SkipSimilarCheckBoxChange(Sender: TObject);
     procedure MinimizeInsteadOfCloseCheckBoxChange(Sender: TObject);
@@ -756,6 +758,11 @@ begin
     CanClose := ConfirmExit;
 end;
 
+procedure TMainForm.HelpWithTranslationMenuItemClick(Sender: TObject);
+begin
+  OpenURL('https://app.transifex.com/--334/autoscreenshot/dashboard/');
+end;
+
 procedure TMainForm.HomePageMenuItemClick(Sender: TObject);
 begin
   OpenURL('https://artem78.github.io/AutoScreenshot/?fromApp');
@@ -1276,6 +1283,7 @@ begin
     ExitMenuItem.Caption := Localizer.I18N('Exit');
     FileMenuItem.Caption := Localizer.I18N('File');
     HomePageMenuItem.Caption := Localizer.I18N('VisitHomepage') + '...';
+    HelpWithTranslationMenuItem.Caption := Localizer.I18N('HelpWithTranslation') + '...';
 
     // Main form components
     OutputDirLabel.Caption := Localizer.I18N('OutputDirectory') + ':';
