@@ -61,7 +61,7 @@
 	<target name="clean">
 		<delete dir="${build_dir}"/>
 		<delete dir="${build_x86_dir}"/>
-		<delete dir="${build_x86_dir}"/>
+		<delete dir="${build_x64_dir}"/>
 		<delete dir="lib"/>
 		<delete file="${executable}"/>
 		<delete dir="${temp_dir}"/>
