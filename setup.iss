@@ -105,7 +105,6 @@ Source: "lang\*.ini";   DestDir: "{app}\lang";   Flags: ignoreversion recursesub
 Source: "sounds\*.wav"; DestDir: "{app}\sounds"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-; ToDo: Remove config.ini when uninstall or make this optional
 
 [Icons]
 Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -119,4 +118,5 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 Root: "HKCU"; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueName: "Auto Screenshot"; Flags: uninsdeletekey
 
 [UninstallDelete]
-Type: files; Name: "{app}\config.ini"
+; Remove all data files (config.ini, journal.dat, log and etc.)
+Type: filesandordirs; Name: "{userappdata}\AutoScreenshot\"
