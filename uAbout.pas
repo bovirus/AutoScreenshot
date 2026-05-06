@@ -18,6 +18,8 @@ type
     AuthorValueLabel1: TLabel;
     CompillerTitleLabel: TLabel;
     CompillerValueLabel: TLabel;
+    GithubTitleLabel: TLabel;
+    GithubValueLabel: TLabel;
     LinkTitleLabel: TLabel;
     LicenseValueLabel: TLabel;
     AuthorMailLinkLabel: TLabel;
@@ -39,6 +41,9 @@ type
     procedure AuthorMailLinkLabelMouseEnter(Sender: TObject);
     procedure AuthorMailLinkLabelMouseLeave(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure GithubValueLabelClick(Sender: TObject);
+    procedure GithubValueLabelMouseEnter(Sender: TObject);
+    procedure GithubValueLabelMouseLeave(Sender: TObject);
     procedure LinkValueLabelClick(Sender: TObject);
     procedure LinkValueLabelMouseEnter(Sender: TObject);
     procedure LinkValueLabelMouseLeave(Sender: TObject);
@@ -61,6 +66,7 @@ const
   ProjectURLTitle = 'https://artem78.github.io/AutoScreenshot/';
   ProjectURL = ProjectURLTitle + '?fromApp';
   AuthorMail = 'megabyte1024@ya.ru';
+  ProjectGithubUrl = 'https://github.com/artem78/AutoScreenshot';
 
 procedure TAboutForm.FormCreate(Sender: TObject);
 const
@@ -143,7 +149,24 @@ begin
   CompillerValueLabel.Caption := Format('FPC %s / Lazarus %s',
                                  [{$I %FPCVersion%}, laz_version]);
 
+  GithubValueLabel.Caption := ProjectGithubUrl;
+
   // FixMe: Close button icon not hidden
+end;
+
+procedure TAboutForm.GithubValueLabelClick(Sender: TObject);
+begin
+  OpenURL(ProjectGithubUrl);
+end;
+
+procedure TAboutForm.GithubValueLabelMouseEnter(Sender: TObject);
+begin
+  (Sender as TLabel).Font.Style := (Sender as TLabel).Font.Style + [fsUnderline];
+end;
+
+procedure TAboutForm.GithubValueLabelMouseLeave(Sender: TObject);
+begin
+  (Sender as TLabel).Font.Style := (Sender as TLabel).Font.Style - [fsUnderline];
 end;
 
 procedure TAboutForm.AuthorMailLinkLabelMouseEnter(Sender: TObject);

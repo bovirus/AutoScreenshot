@@ -218,6 +218,28 @@ object AboutForm: TAboutForm
       OnMouseEnter = LinkValueLabelMouseEnter
       OnMouseLeave = LinkValueLabelMouseLeave
     end
+    object GithubTitleLabel: TLabel
+      Left = 0
+      Height = 16
+      Top = 154
+      Width = 89
+      Caption = 'Github:'
+      ParentColor = False
+    end
+    object GithubValueLabel: TLabel
+      Cursor = crHandPoint
+      Left = 95
+      Height = 16
+      Top = 154
+      Width = 137
+      Caption = 'http://...'
+      Font.Color = clBlue
+      ParentColor = False
+      ParentFont = False
+      OnClick = GithubValueLabelClick
+      OnMouseEnter = GithubValueLabelMouseEnter
+      OnMouseLeave = GithubValueLabelMouseLeave
+    end
   end
   object ButtonPanel: TButtonPanel
     AnchorSideTop.Control = Panel
