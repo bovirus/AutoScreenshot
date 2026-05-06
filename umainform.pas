@@ -35,6 +35,7 @@ type
     Label1: TLabel;
     Label2: TLabel;
     HelpWithTranslationMenuItem: TMenuItem;
+    ReportIssueMenuItem: TMenuItem;
     SkipSimilarPanel: TPanel;
     SkipSimilarCheckBox: TCheckBox;
     FileMenuItem: TMenuItem;
@@ -121,6 +122,7 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure HelpWithTranslationMenuItemClick(Sender: TObject);
     procedure HomePageMenuItemClick(Sender: TObject);
+    procedure ReportIssueMenuItemClick(Sender: TObject);
     procedure SkipSimilarCheckBoxChange(Sender: TObject);
     procedure MinimizeInsteadOfCloseCheckBoxChange(Sender: TObject);
     procedure OldScreenshotCleanerEnabledCheckBoxChange(Sender: TObject);
@@ -768,6 +770,11 @@ begin
   OpenURL('https://artem78.github.io/AutoScreenshot/?fromApp');
 end;
 
+procedure TMainForm.ReportIssueMenuItemClick(Sender: TObject);
+begin
+  OpenURL('https://github.com/artem78/AutoScreenshot/issues/new?assignees=&labels=bug&template=bug_report.md&title=');
+end;
+
 procedure TMainForm.SkipSimilarCheckBoxChange(Sender: TObject);
 begin
   SkipSimilar := TCheckBox(Sender).Checked;
@@ -1284,6 +1291,7 @@ begin
     FileMenuItem.Caption := Localizer.I18N('File');
     HomePageMenuItem.Caption := Localizer.I18N('VisitHomepage') + '...';
     HelpWithTranslationMenuItem.Caption := Localizer.I18N('HelpWithTranslation') + '...';
+    ReportIssueMenuItem.Caption:=Localizer.I18N('ReportIssue')+'...';
 
     // Main form components
     OutputDirLabel.Caption := Localizer.I18N('OutputDirectory') + ':';
