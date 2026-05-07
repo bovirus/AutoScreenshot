@@ -120,4 +120,6 @@ Root: "HKCU"; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueName
 
 [UninstallDelete]
 ; Remove all data files (config.ini, journal.dat, log and etc.)
-Type: filesandordirs; Name: "{userappdata}\AutoScreenshot\"
+; NOTE:  "AutoScreenshot" must be writen WITHOUT space!
+Name: {userappdata}\AutoScreenshot\*.*; Type: files
+Name: "{userappdata}\AutoScreenshot"; Type: filesandordirs;
