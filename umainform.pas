@@ -432,6 +432,11 @@ begin
   // https://wiki.lazarus.freepascal.org/Autosize_/_Layout#Order_of_controls_with_same_Align
   ButtonsPanel.Top:=0;
   StatusBar1.Top:=999;
+
+  { Change focus from OuputDirEdit (first control) to any other control
+    to prevent directory name be moved and truncated
+    https://github.com/artem78/AutoScreenshot/issues/67 }
+  ActiveControl:=AutoCaptureControlGroup;
 end;
 
 procedure TMainForm.ReadSettings;
