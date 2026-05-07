@@ -229,7 +229,7 @@
 				<!-- Run Inno Setup script compiling -->
 				<exec executable="${inno_setup_dir}/ISCC.exe" failonerror="true">
 					<!--<env key="LazarusDir" value="${lazarus_dir}"/>-->
-					<arg value="/DRevision=${version}"/>
+					<arg value="/DMyAppRevision=${version}"/>
 					<arg value="setup.iss"/>
 				</exec>
 			<!--</then>

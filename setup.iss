@@ -3,8 +3,10 @@
 
 #define MyAppName      "Auto Screenshot"
 #define MyAppExeName   "AutoScreenshot.exe"
-#define MyAppRevision   Revision
 #define MyAppVersion    GetFileProductVersion("AutoScreenshot.exe")
+#ifndef MyAppRevision 
+  #define MyAppRevision   'v' + MyAppVersion  ; Normally passed from command line on build process
+#endif
 #define MyAppPublisher "Artem Demin"
 #define MyAppURL       "https://artem78.github.io/AutoScreenshot/"
 #define CurrentYear    GetDateTimeString('yyyy','','')
