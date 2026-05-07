@@ -5,19 +5,28 @@ unit uDonateForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls;
 
 type
+
+  TDonateEntry = record
+    Title, WalletID, IconBase64, Url: String;
+  end;
 
   { TDonateForm }
 
   TDonateForm = class(TForm)
+    DonateInfoLabel: TLabel;
+    PaymentMethodsPanel: TPanel;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
+    Entries: array of TDonateEntry;
     procedure CopyWalletToClipboard(ASender: TObject);
-    class procedure LoadWalletsData(ASL: TStringList); static;
+    procedure LoadData();
     class procedure OpenWebPage; static;
+    procedure OpenDonateUrl(ASender: TObject);
   public
 
   end;
@@ -27,8 +36,8 @@ var
 
 implementation
 
-uses StdCtrls, Clipbrd, LCLIntf, ExtCtrls, uLocalization, fpjson,
-  opensslsockets, base64, StrUtils, fphttpclient;
+uses Clipbrd, LCLIntf, uLocalization, fpjson,
+  opensslsockets, base64, StrUtils, fphttpclient, Buttons;
 
 {$R *.lfm}
 
@@ -74,74 +83,114 @@ end;
 { TDonateForm }
 
 procedure TDonateForm.FormCreate(Sender: TObject);
+  // Create any dummy empty control to prevent layout broken when no control in grid position
+  procedure AddEmptyCtrl;
+  begin
+    with TLabel.Create(PaymentMethodsPanel) do
+    begin
+      Text := '';
+      AutoSize := True;
+      Parent := PaymentMethodsPanel;
+    end;
+  end;
+
 var
-  Wallets: TStringList;
   I: Integer;
-  IconBase64: String;
+  IconBase64, DonateUrl: String;
 begin
   Caption := Localizer.I18N('Donate');
+  DonateInfoLabel.Caption := Localizer.I18N('DonateInfo');
 
-  Wallets := TStringList.Create;
   try
-    try
-      LoadWalletsData(Wallets);
+    LoadData();
 
-      for I := 0 to Wallets.Count - 1 do
+    for I := 0 to Length(Entries) - 1 do
+    begin
+      // Payment method icon
+      IconBase64 := Entries[I].IconBase64;
+      if not IconBase64.IsEmpty then
       begin
-        IconBase64 := ExtractWord(2, Wallets.ValueFromIndex[I], [#9]);
-        if not IconBase64.IsEmpty then
+        with TImage.Create(PaymentMethodsPanel) do
         begin
-          with TImage.Create(Self) do
-          begin
-            Picture.LoadFromBase64(IconBase64);
-            BorderSpacing.CellAlignVertical := ccaCenter;
-            BorderSpacing.CellAlignHorizontal := {ccaCenter} ccaRightBottom;
-            Parent := Self;
-          end;
-        end
-        else
-        begin
-          // Create any dummy empty control to prevent layout broken when no icon
-          with TLabel.Create(Self) do
-          begin
-            Text := '';
-            AutoSize := True;
-            Parent := Self;
-          end;
-        end;
-
-        with TLabel.Create(Self) do
-        begin
-          Caption := Wallets.Names[I] + ':';
+          Picture.LoadFromBase64(IconBase64);
           BorderSpacing.CellAlignVertical := ccaCenter;
-          //BorderSpacing.CellAlignHorizontal := ccaRightBottom;
-          Parent := Self;
+          BorderSpacing.CellAlignHorizontal := {ccaCenter} ccaRightBottom;
+          Parent := PaymentMethodsPanel;
         end;
+      end
+      else
+      begin
+        AddEmptyCtrl;
+      end;
 
-        with TEdit.Create(Self) do
+      // Payment method name
+      with TLabel.Create(PaymentMethodsPanel) do
+      begin
+        Caption := Entries[I].Title {+ ':'};
+        BorderSpacing.CellAlignVertical := ccaCenter;
+        //BorderSpacing.CellAlignHorizontal := ccaRightBottom;
+        Parent := PaymentMethodsPanel;
+      end;
+
+      // Payment link button
+      DonateUrl := Entries[I].Url;
+      if not DonateUrl.IsEmpty then
+      begin
+        with TBitBtn.Create(PaymentMethodsPanel) do
+        begin
+          OnClick := @OpenDonateUrl;
+          BorderSpacing.CellAlignVertical := ccaCenter;
+          Parent := PaymentMethodsPanel;
+          Name := 'OpenDonateUrlButton_' + IntToStr(I);
+          Caption:='';
+          LoadGlyphFromResourceName(HINSTANCE, '_EXTERNAL_LINK_ICON');
+          Hint:=Localizer.I18N('OpenPayLinkInBrowser');
+          ShowHint:=True;
+        end;
+      end
+      else
+      begin
+        AddEmptyCtrl;
+      end;
+
+      if not Entries[I].WalletID.IsEmpty then  // allowed to be empty
+      begin
+        // Wallet identifier
+        with TEdit.Create(PaymentMethodsPanel) do
         begin
           Width := 300;
           Constraints.MinWidth := Width;
-          Text := ExtractWord(1, Wallets.ValueFromIndex[I], [#9]);
+          Text := Entries[I].WalletID;
           ReadOnly := True;
           BorderSpacing.CellAlignVertical := ccaCenter;
-          Parent := Self;
+          Parent := PaymentMethodsPanel;
+          BorderSpacing.Left := {16} 25;
         end;
 
-        with TButton.Create(Self) do
+        // Copy wallet identifier button
+        with TButton.Create(PaymentMethodsPanel) do
         begin
           Caption := Localizer.I18N('Copy');
           OnClick := @CopyWalletToClipboard;
           BorderSpacing.CellAlignVertical := ccaCenter;
-          Parent := Self;
+          Parent := PaymentMethodsPanel;
         end;
+      end
+      else
+      begin
+        AddEmptyCtrl;
+        AddEmptyCtrl;
       end;
-    finally
-      Wallets.Free;
+
     end;
   except
     // No action needed there
   end;
+end;
+
+procedure TDonateForm.FormDestroy(Sender: TObject);
+begin
+  SetLength(Entries, 0);
 end;
 
 procedure TDonateForm.FormShow(Sender: TObject);
@@ -175,17 +224,24 @@ begin
   Clipboard.AsText := Component.Text;
 end;
 
-class procedure TDonateForm.LoadWalletsData(ASL: TStringList);
+procedure TDonateForm.LoadData();
 const
+  {$IFOPT D+}
+  ApiUrl = 'https://api.github.com/gists/f293c446c3f2e83900f5a1d7b5596755';
+  JsonFileName = 'test_wallets.json';
+  {$else}
   ApiUrl = 'https://api.github.com/gists/6c79ab382865da9b598927194c52eb09';
+  JsonFileName = 'donate_wallets.json';
+  {$ENDIF}
 var
   Http: TFPHTTPClient;
   Json: TJSONData;
   Str: String;
   Enumerator: TBaseJSONEnumerator;
-  PaymentMethod, WalletID, IconBase64: String;
+  PaymentMethod, WalletID, IconBase64, DonateUrl: String;
+  I: Integer = 0;
 begin
-  ASL.Clear;
+  SetLength(Entries, 0);
 
   Http := TFPHttpClient.Create(Nil);
   try
@@ -194,7 +250,7 @@ begin
     Http.AddHeader('User-Agent', 'Auto Screenshot');
     Json := GetJSON(Http.Get(ApiUrl));
     try
-      Str := TJSONObject(Json).Objects['files'].Objects['donate_wallets.json'].Strings['content'];
+      Str := TJSONObject(Json).Objects['files'].Objects[JsonFileName].Strings['content'];
     finally
       Json.Free;
     end;
@@ -210,13 +266,24 @@ begin
             PaymentMethod := Items[0].AsString;
             WalletID      := Items[1].AsString;
             IconBase64 := '';
+            DonateUrl := '';
             try
               if Count > 2 then
+              begin
                 IconBase64 := TJSONObject(Items[2]).Get('icon', '');
+                DonateUrl  := TJSONObject(Items[2]).Get('payment_url', '');
+              end;
             except
             end;
           end;
-          ASL.AddPair(PaymentMethod, WalletID + #9 + IconBase64);
+
+          SetLength(Entries, Length(Entries) + 1); // +1 item
+          Entries[I].Title := PaymentMethod;
+          Entries[I].WalletID := WalletID;
+          Entries[I].IconBase64 := IconBase64;
+          Entries[I].Url := DonateUrl;
+
+          Inc(i);
         end;
       finally
         Enumerator.Free;
@@ -234,15 +301,26 @@ class procedure TDonateForm.OpenWebPage;
 var
   Url: String;
 begin
-  case Localizer.LanguageInfo.Code of
+  {case Localizer.LanguageInfo.Code of
     'fr':
       Url := 'https://github.com/artem78/AutoScreenshot/blob/master/docs/README-fr.md#faire-un-don';
     'ru', 'uk':
       Url := 'https://github.com/artem78/AutoScreenshot/blob/master/docs/README-ru.md#%D0%B2%D0%BE%D0%B7%D0%BD%D0%B0%D0%B3%D1%80%D0%B0%D0%B4%D0%B8%D1%82%D1%8C-%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0-%D0%BC%D0%B0%D1%82%D0%B5%D1%80%D0%B8%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE';
     else
       Url := 'https://github.com/artem78/AutoScreenshot/tree/master#donate';
-  end;
+  end;}
+  Url:='https://artem78.github.io/AutoScreenshot/pages/donate.html?fromApp';
 
+  OpenURL(Url);
+end;
+
+procedure TDonateForm.OpenDonateUrl(ASender: TObject);
+var
+  Url: string;
+  Idx: Integer = -1;
+begin
+  Idx := StrToInt(ExtractWord(2, (ASender as TComponent).Name, ['_']));
+  Url := Entries[Idx].Url;
   OpenURL(Url);
 end;
 

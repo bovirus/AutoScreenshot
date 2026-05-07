@@ -7,7 +7,7 @@ unit uUtilsMore;
 interface
 
 uses
-  Classes, SysUtils, StdCtrls;
+  Classes, SysUtils, StdCtrls, CustomTimer;
 
 type
 
@@ -51,10 +51,39 @@ type
     procedure AutoWidth;
   end;
 
+  
+function {CompareImages} ImagesEqual(const AImgFilename1, AImgFilename2: String;
+              APercentThreshold: Integer = 100): Boolean;
+
+type
+
+  { Almost the same as TTimer, but adds two methods for recieving time of next run }
+
+  { TTimerV2 }
+
+  TTimerV2 = class({TTimer} TCustomTimer)
+  private
+    FLastExecutionTime: TDateTime;
+    function GetNextExecutionTime: TDateTime;
+    function GetSecondsBeforeNextExecution: Integer;
+    procedure DoOnTimer; override;
+    procedure UpdateTimer; override;
+  public
+    property NextExecutionTime: TDateTime read GetNextExecutionTime;
+    property SecondsBeforeNextExecution: Integer read GetSecondsBeforeNextExecution;
+  {published // from TTimer
+    property Enabled;
+    property Interval;
+    property OnTimer;
+    property OnStartTimer;
+    property OnStopTimer;}
+  end;
+
 implementation
 
 uses
-  RegExpr, StrUtils, Menus  {for ShortCutToKey}, LCLProc, LCLType, Graphics, LCLIntf, Math;
+  RegExpr, StrUtils, DateUtils, Menus {for ShortCutToKey}, LCLProc, LCLType, Graphics, LCLIntf,
+  Math, BGRABitmap, BGRABitmapTypes;
 
 type
   { TJoinInteger }
@@ -115,6 +144,40 @@ begin
   Result := not (HotKey1 = Hotkey2);
 end;
 
+{ TTimerV2 }
+
+{ Returns time of next timer call. If timer disabled returns MinDateTime. }
+function TTimerV2.GetNextExecutionTime: TDateTime;
+begin
+  if Enabled then
+    Result := IncMilliSecond(FLastExecutionTime, Interval)
+  else
+    Result := MinDateTime;
+end;
+
+{ Returns number of seconds before next timer call. If timer disabled returns -1. }
+function TTimerV2.GetSecondsBeforeNextExecution: Integer;
+begin
+  if Enabled then
+    Result := SecondsBetween(NextExecutionTime, now)
+  else
+    Result := -1;
+end;
+
+procedure TTimerV2.DoOnTimer;
+begin
+  FLastExecutionTime := Now;
+
+  inherited {DoOnTimer};
+end;
+
+procedure TTimerV2.UpdateTimer;
+begin
+  FLastExecutionTime := Now;
+
+  inherited UpdateTimer;
+end;
+
 { TComboBoxHelper }
 
 procedure TComboBoxHelper.AutoWidth;
@@ -138,6 +201,54 @@ begin
     Self{.Width}.Constraints.MinWidth := TextMaxWidth + Metr + SPACING;
   finally
     Bmp.Free;
+  end;
+end;
+
+function ImagesEqual(const AImgFilename1, AImgFilename2: String; APercentThreshold: Integer): Boolean;
+var
+  Bmp1, Bmp2: TBGRABitmap {= nil};
+  p1, p2: PBGRAPixel;
+  n: integer;
+  EqualPixelCount: Integer = 0;
+  R: Boolean;
+begin
+  if (not FileExists(AImgFilename1)) or (not FileExists(AImgFilename2)) then
+    Exit(False);
+
+  Bmp1 := TBGRABitmap.Create();
+  Bmp2 := TBGRABitmap.Create();
+  try
+    try
+      Bmp1.LoadFromFile(AImgFilename1);
+      Bmp2.LoadFromFile(AImgFilename2);
+
+      if (Bmp1.Width <> Bmp2.Width) or (Bmp1.Height <> Bmp2.Height) then
+        Exit(False);
+
+      p1 := bmp1.Data;
+      p2 := bmp2.Data;
+      for n := bmp1.NbPixels-1 downto 0 do
+      begin
+        //if p1 <> p2 then
+        //if p1^ = p2^ then
+        if (p1^.red = p2^.red) and (p1^.green = p2^.green) and (p1^.blue = p2^.blue) then
+          Inc(EqualPixelCount);
+
+        inc(p1);
+        inc(p2);
+      end;
+
+      R := EqualPixelCount / bmp1.NbPixels >= APercentThreshold / 100;
+      DebugLn('pixel matches=%d/%d (%.2f%%) Threshold=%d%% result=%s', [EqualPixelCount,
+              bmp1.NbPixels, (EqualPixelCount / bmp1.NbPixels) * 100,
+              APercentThreshold, BoolToStr(r, 'TRUE', 'FALSE')]);
+      Exit(R);
+    finally
+      Bmp2.Free;
+      Bmp1.Free;
+    end;
+  except
+    Exit(False);
   end;
 end;
 

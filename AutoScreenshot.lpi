@@ -22,7 +22,7 @@
         <TextDesc Value="Automatic screenshot maker"/>
       </XPManifest>
       <Icon Value="0"/>
-      <Resources Count="23">
+      <Resources Count="25">
         <Resource_0 FileName="res\camera_bw.ico" Type="ICON" ResourceName="_CAMERA_BW"/>
         <Resource_1 FileName="res\camera_flash1.ico" Type="ICON" ResourceName="_CAMERA_FLASH_1"/>
         <Resource_2 FileName="res\camera_flash2.ico" Type="ICON" ResourceName="_CAMERA_FLASH_2"/>
@@ -46,6 +46,8 @@
         <Resource_20 FileName="libs/country-flags/country-flags/ua_16.png" Type="RCDATA" ResourceName="FLAG_UK"/>
         <Resource_21 FileName="libs/country-flags/country-flags/cn_16.png" Type="RCDATA" ResourceName="FLAG_ZH"/>
         <Resource_22 FileName="libs/country-flags/country-flags/it_16.png" Type="RCDATA" ResourceName="FLAG_IT"/>
+        <Resource_23 FileName="res/external_link.bmp" Type="BITMAP" ResourceName="_EXTERNAL_LINK_ICON"/>
+        <Resource_24 FileName="res\camera_user_idle.ico" Type="ICON" ResourceName="_CAMERA_USER_IDLE"/>
       </Resources>
     </General>
     <i18n>
@@ -54,9 +56,8 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <MajorVersionNr Value="1"/>
-      <MinorVersionNr Value="16"/>
-      <RevisionNr Value="2"/>
-      <StringTable FileDescription="Automatic screenshot maker" ProductName="Auto Screenshot" ProductVersion="1.16.2"/>
+      <MinorVersionNr Value="21"/>
+      <StringTable FileDescription="Automatic screenshot maker" ProductName="Auto Screenshot" ProductVersion="1.21"/>
     </VersionInfo>
     <CustomData Count="13">
       <Item0 Name="lazpackager/copyright" Value="2020-2024, Artem Demin &lt;megabyte1024@ya.ru>"/>
@@ -114,7 +115,7 @@ Vcs-Browser: https://github.com/artem78/AutoScreenshot
 
 Package: ?PACKAGE_NAME?
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, openssl, libsqlite3-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, openssl, libsqlite3-0, libavif
 Description: ?DESCRIPTION?
  ?DESCRIPTION_LONG?
 "/>
@@ -255,9 +256,6 @@ override_dh_auto_install:
           </Linking>
           <Other>
             <CustomOptions Value="-B"/>
-            <OtherDefines Count="1">
-              <Define0 Value="SIMULATE_OLD_FILES_DELETION"/>
-            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item3>

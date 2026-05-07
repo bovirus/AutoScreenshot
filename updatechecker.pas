@@ -5,33 +5,27 @@ unit UpdateChecker;
 interface
 
 uses
-  Classes, SysUtils, ButtonPanel;
-
-procedure CheckForUpdates(ASilent: Boolean = False; AIgnorePreRelease: Boolean = True);
-
-
-implementation
-
-uses
-  Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls, uUtilsMore,
-  uLocalization, uUtils, umainform, LCLIntf, LazLoggerBase,
-  fphttpclient, opensslsockets, fpjson, jsonparser, StrUtils;
-
-{$R *.lfm}
-
+  Classes, SysUtils, ButtonPanel, StdCtrls, Forms, ComCtrls, ExtCtrls,
+  uUtilsMore;
+  
 type
-
   TUpdateFormState = (ufsHidden, ufsFetchingData, ufsHasUpdates,
                       ufsNoUpdates, ufsError);
 
   { TUpdateCheckerForm }
 
   TUpdateCheckerForm = class(TForm)
+    ChangeLogMemo: TMemo;
+    ChangeLogLabel: TLabel;
+    ChangeLogLabelBottom: TLabel;
     MsgLabel: TLabel;
+    ChangeLogPanel: TPanel;
+    MainPanel: TPanel;
     ProgressBar: TProgressBar;
     ButtonPanel1: TButtonPanel;
     procedure FormCreate(Sender: TObject);
     procedure CancelButtonClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
   private
     FState: TUpdateFormState;
@@ -44,6 +38,19 @@ type
     property State: TUpdateFormState write SetState;
   end;
 
+procedure CheckForUpdates(ASilent: Boolean = False; AIgnorePreRelease: Boolean = True);
+
+
+implementation
+
+uses
+  Controls, Graphics, Dialogs,
+  uLocalization, uUtils, umainform, LCLIntf, LazLoggerBase,
+  fphttpclient, opensslsockets, fpjson, jsonparser, StrUtils;
+
+{$R *.lfm}
+
+type
 
   TSuccessCallback = procedure (AVer: TProgramVersion; AUrl: String;
                                 AChangelog: String) {of object};
@@ -75,11 +82,11 @@ type
 
 const
   ApiUrl =
-{$IFOPT D+}
-    'https://eo873h2zv0emseb.m.pipedream.net/'
-{$ELSE}
-    'https://api.github.com/repos/artem78/AutoScreenshot/releases'
-{$ENDIF}
+//{$IFOPT D+}
+//    'https://eo873h2zv0emseb.m.pipedream.net/'
+//{$ELSE}
+    'https://api.github.com/repos/artem78/AutoScreenshot/releases?per_page=100'
+//{$ENDIF}
   ;
 
 var
@@ -171,12 +178,14 @@ var
   JsonData: TJSONData;
   JsonArrayEnum: TBaseJSONEnumerator;
   TagName: String;
-  Version: TProgramVersion;
+  Version, CurrentVersion: TProgramVersion;
   IsPreRelease: Boolean;
+  ChangeLogPart: String;
 begin
   LatestVersion := TProgramVersion.Create();
   DownloadUrl := '';
   ChangeLog := '';
+  CurrentVersion := TProgramVersion.Create(GetProgramVersionStr());
 
   DebugLn('Start update checking...');
 
@@ -190,7 +199,7 @@ begin
 
       JsonData := GetJSON(ResponseStr);
       try
-        JsonArrayEnum := TJSONArray(JsonData).GetEnumerator;
+        JsonArrayEnum := TJSONArray(JsonData).GetEnumerator; // from new to old
         //DebugLnEnter;
         try
           while JsonArrayEnum.MoveNext do
@@ -229,11 +238,22 @@ begin
 
             Version := TProgramVersion.Create(ExtractDelimited(1, TagName, ['-']));
             DebugLn('Version %s', [Version.ToString()]);
+            if Version > CurrentVersion then
+            begin
+              ChangeLogPart := Trim(JsonArrayEnum.Current.Value.GetPath('body').AsString);
+              if ChangeLogPart.IsEmpty then
+                ChangeLogPart := Localizer.I18N('NoData');
+
+              ChangeLog := ChangeLog
+                         + '=====   ' + TagName + ' (' + ISO8601ToReadableDate(JsonArrayEnum.Current.Value.GetPath({'published_at'} 'created_at').AsString) + ')   =====' + sLineBreak + sLineBreak
+                         + ChangeLogPart + sLineBreak + ' ' + sLineBreak;
+            end;
+
             if Version > LatestVersion then
             begin
               LatestVersion := Version;
               DownloadUrl   := JsonArrayEnum.Current.Value.GetPath('html_url').AsString;
-              ChangeLog     := JsonArrayEnum.Current.Value.GetPath('body').AsString;
+              //ChangeLog     := JsonArrayEnum.Current.Value.GetPath('body').AsString;
             end;
           end;
         finally
@@ -279,7 +299,7 @@ end;
 
 procedure TUpdateCheckerForm.FormCreate(Sender: TObject);
 begin
-  Caption := Localizer.I18N('CheckForUpdates');
+  Caption := 'Auto Screenshot ' + #8211 + ' ' + Localizer.I18N('CheckForUpdatesWindowCaption');
   with ButtonPanel1 do
   begin
     CloseButton.Caption  := Localizer.I18N('Close');
@@ -287,11 +307,18 @@ begin
     CancelButton.Caption := Localizer.I18N('No');
   end;
   State := ufsHidden;
+  ChangeLogLabel.Caption := Localizer.I18N('Changelog') + ':';
+  ChangeLogLabelBottom.Caption := Localizer.I18N('AskDownloadUpdate');
 end;
 
 procedure TUpdateCheckerForm.CancelButtonClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TUpdateCheckerForm.FormResize(Sender: TObject);
+begin
+  MoveToDefaultPosition;
 end;
 
 procedure TUpdateCheckerForm.OKButtonClick(Sender: TObject);
@@ -320,6 +347,7 @@ begin
         begin
           Msg.Append(Localizer.I18N('CheckingForUpdates'));
 
+          ChangeLogPanel.Hide;
           ButtonPanel1.Hide;
         end;
 
@@ -327,6 +355,7 @@ begin
         begin
           Msg.Append(Localizer.I18N('NoUpdatesFound'));
 
+          ChangeLogPanel.Hide;
           ButtonPanel1.ShowButtons := [pbClose];
           ButtonPanel1.Show;
         end;
@@ -338,11 +367,14 @@ begin
                    [LatestVersion.ToString(True), CurrentVersion.ToString(True)])
              .AppendLine
              // Fix for GTK2 - https://forum.lazarus.freepascal.org/index.php/topic,63451.0.html
-             .AppendLine{$If defined(Linux) and defined(LCLGTK2)}(' '){$EndIf}
-             .AppendLine(ChangeLog.Trim)
+  //           .AppendLine{$If defined(Linux) and defined(LCLGTK2)}(' '){$EndIf}
+   //          .AppendLine(ChangeLog.Trim)
              //.AppendLine
-             .AppendLine{$If defined(Linux) and defined(LCLGTK2)}(' '){$EndIf}
-             .Append(Localizer.I18N('AskDownloadUpdate'));
+  //           .AppendLine{$If defined(Linux) and defined(LCLGTK2)}(' '){$EndIf}
+ {            .Append(Localizer.I18N('AskDownloadUpdate'))};
+
+          ChangeLogMemo.Text := Trim(ChangeLog);
+          ChangeLogPanel.Show;
 
           ButtonPanel1.ShowButtons := [pbOK, pbCancel];
           ButtonPanel1.Show;
@@ -357,6 +389,7 @@ begin
                 .Append(ErrorMsg);
           end;
 
+          ChangeLogPanel.Hide;
           ButtonPanel1.ShowButtons := [pbClose];
           ButtonPanel1.Show;
         end;

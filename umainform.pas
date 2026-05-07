@@ -14,17 +14,16 @@ uses
   {Messages,} SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, {ComCtrls,} ExtCtrls, StdCtrls, inifiles, Spin, {FileCtrl,}
   Menus, Buttons, EditBtn, uLocalization, DateTimePicker,
-  LCLIntf, ScreenGrabber, uHotKeysForm, uUtilsMore, GlobalKeyHook,
+  LCLIntf, ComCtrls, ScreenGrabber, uHotKeysForm, uUtilsMore, GlobalKeyHook,
   OldScreenshotCleaner, UniqueInstance, uplaysound, ZStream { for Tcompressionlevel };
 
 type
-  TTrayIconState = (tisDefault, tisBlackWhite, tisFlashAnimation);
+  TTrayIconState = (tisDefault, tisBlackWhite, tisFlashAnimation, tisUserIdle);
 
   { TMainForm }
 
   TMainForm = class(TForm)
     AutoCheckForUpdatesMenuItem: TMenuItem;
-    Button1: TButton;
     EmptyLabel2: TLabel;
     EmptyLabel3: TLabel;
     EmptyLabel4: TLabel;
@@ -32,21 +31,22 @@ type
     EmptyLabel6: TLabel;
     EmptyLabel7: TLabel;
     EmptyLabel8: TLabel;
-    FileMenuItem: TMenuItem;
-    ExitMenuItem: TMenuItem;
-    Image1: TImage;
-    Label4: TLabel;
-    EmptyLabel1: TLabel;
-    MenuImageList: TImageList;
+    EmptyLabel9: TLabel;
     Label1: TLabel;
     Label2: TLabel;
-    Label3: TLabel;
+    HelpWithTranslationMenuItem: TMenuItem;
+    ReportIssueMenuItem: TMenuItem;
+    SkipSimilarPanel: TPanel;
+    SkipSimilarCheckBox: TCheckBox;
+    FileMenuItem: TMenuItem;
+    ExitMenuItem: TMenuItem;
+    EmptyLabel1: TLabel;
+    MenuImageList: TImageList;
     LangFlagImageList: TImageList;
-    AboutProMenuItem: TMenuItem;
     HomePageMenuItem: TMenuItem;
+    PreCmdLabel: TLabel;
+    PreCmdEdit: TEdit;
     MinimizeInsteadOfCloseCheckBox: TCheckBox;
-    Panel1: TPanel;
-    ProAdvPanel: TPanel;
     SettingsPanel: TPanel;
     OutputDirPanel: TPanel;
     FileNameTemplatePanel: TPanel;
@@ -66,9 +66,11 @@ type
     PostCmdEdit: TEdit;
     CheckForUpdatesMenuItem: TMenuItem;
     OutputDirEdit: TDirectoryEdit;
-    Timer: TTimer;
+    SkipSimilarMatchPercentSpinEdit: TSpinEdit;
     OutputDirLabel: TLabel;
     CaptureIntervalLabel: TLabel;
+    AutoCaptureUpdaterTimer: TTimer;
+    StatusBar1: TStatusBar;
     TrayIcon: TTrayIcon;
     ImageFormatLabel: TLabel;
     TakeScreenshotButton: TButton;
@@ -112,22 +114,20 @@ type
     SeqNumberDigitsCountSpinEdit: TSpinEdit;
     SeqNumberDigitsCountLabel: TLabel;
     UniqueInstance1: TUniqueInstance;
-    procedure AboutProMenuItemClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure AutoCaptureUpdaterTimerTimer(Sender: TObject);
     procedure CheckForUpdatesMenuItemClick(Sender: TObject);
     procedure AutoCheckForUpdatesMenuItemClick(Sender: TObject);
     procedure CompressionLevelComboBoxChange(Sender: TObject);
     procedure ExitMenuItemClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure HelpWithTranslationMenuItemClick(Sender: TObject);
     procedure HomePageMenuItemClick(Sender: TObject);
-    procedure Label3Click(Sender: TObject);
-    procedure Label3MouseEnter(Sender: TObject);
-    procedure Label3MouseLeave(Sender: TObject);
+    procedure ReportIssueMenuItemClick(Sender: TObject);
+    procedure SkipSimilarCheckBoxChange(Sender: TObject);
     procedure MinimizeInsteadOfCloseCheckBoxChange(Sender: TObject);
     procedure OldScreenshotCleanerEnabledCheckBoxChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure HotKetsSettingsMenuItemClick(Sender: TObject);
     procedure DonateMenuItemClick(Sender: TObject);
     procedure OldScreenshotCleanerMaxAgeUnitComboBoxChange(Sender: TObject);
@@ -136,6 +136,8 @@ type
     procedure CaptureIntervalDateTimePickerChange(Sender: TObject);
     procedure PlaySoundsCheckBoxChange(Sender: TObject);
     procedure PostCmdEditChange(Sender: TObject);
+    procedure PreCmdEditChange(Sender: TObject);
+    procedure SkipSimilarMatchPercentSpinEditChange(Sender: TObject);
     procedure TimerTimer(Sender: TObject);
     procedure ApplicationMinimize(Sender: TObject);
     procedure StartAutoCaptureButtonClick(Sender: TObject);
@@ -198,6 +200,8 @@ type
     public
     FileJournal: TFileJournal;
     private
+
+    AutoCaptureTimer: TTimerV2;
     
     { Methods }
     procedure SetTimerEnabled(AEnabled: Boolean);
@@ -227,8 +231,6 @@ type
     procedure LanguageClick(Sender: TObject);
     function GetLangCodeOfLangMenuItem(const LangItem: TMenuItem): TLanguageCode;
     function FindLangMenuItem(ALangCode: TLanguageCode): TMenuItem;
-    procedure RecalculateLabelWidths;
-    procedure RecalculateLabelWidthsForSeqNumGroup;
     function FormatPath(Str: string): string;
     procedure SetCounter(Val: Integer);
     procedure SetCounterDigits(Val: Integer);
@@ -267,6 +269,16 @@ type
     procedure OnScreenConfigurationChanged(const AEvent: TXEvent);
     {$EndIf}
 
+    procedure SetPreCommand(ACmd: String);
+    function GetPreCommand: String;
+    procedure SetSkipSimilar(AVal: Boolean);
+    function GetSkipSimilar: Boolean;
+    procedure SetSkipSimilarMatchPercent(AVal: Integer);
+    function GetSkipSimilarMatchPercent: Integer;
+
+    procedure UpdateStatusBarAndTrayIconText;
+    procedure ShowNotificationInStatusBar(AMsg: string);
+
 
     { Properties }
     property IsTimerEnabled: Boolean read GetTimerEnabled write SetTimerEnabled;
@@ -289,6 +301,10 @@ type
     property CompressionLevel: Tcompressionlevel read GetCompressionLevel write SetCompressionLevel;
     property Sounds: Boolean read GetSounds write SetSounds;
     property MinimizeInsteadOfClose: Boolean read GetMinimizeInsteadOfClose write SetMinimizeInsteadOfClose;
+    property PreCommand: String read GetPreCommand write SetPreCommand;
+    property SkipSimilar: Boolean read GetSkipSimilar write SetSkipSimilar;
+    property SkipSimilarMatchPercent: Integer read GetSkipSimilarMatchPercent
+                                         write SetSkipSimilarMatchPercent;
 
     // Messages
     {$IfDef Windows}
@@ -411,6 +427,10 @@ begin
       Append('');
   end;
 
+  // Fix incorrect order for statusbar and panel with buttons
+  // https://wiki.lazarus.freepascal.org/Autosize_/_Layout#Order_of_controls_with_same_Align
+  ButtonsPanel.Top:=0;
+  StatusBar1.Top:=999;
 end;
 
 procedure TMainForm.ReadSettings;
@@ -427,8 +447,9 @@ const
   DefaultCompressionLevel = cldefault;
   DefaultScreenshotCleanerMaxAge: TInterval = (
     Val: 1;
-    Unit_: iuMonths
+    &Unit: iuMonths
   );
+  DefaultSkipSimilarMatchPercent = {95} 100;
   
   LogFileName = 'log.txt';
 var
@@ -526,7 +547,7 @@ begin
   end;
 
   // Start autocapture
-  Timer.Interval := SecondOfTheDay(CaptureIntervalDateTimePicker.Time) * MSecsPerSec;
+  AutoCaptureTimer.Interval := SecondOfTheDay(CaptureIntervalDateTimePicker.Time) * MSecsPerSec;
   StartCaptureOnStartUpCheckBox.Checked :=
       Ini.ReadBool(DefaultConfigIniSection, 'StartCaptureOnStartUp', {True} False);
   IsTimerEnabled := StartCaptureOnStartUpCheckBox.Checked;
@@ -554,6 +575,7 @@ begin
   UpdateSeqNumGroupVisibility;
 
   // User command
+  PreCommand := Ini.ReadString(DefaultConfigIniSection, 'PreCmd', '');
   PostCommand := Ini.ReadString(DefaultConfigIniSection, 'PostCmd', '');
 
   // Auto checking for updates
@@ -576,19 +598,10 @@ begin
   // Minimize instead of close
   MinimizeInsteadOfClose := Ini.ReadBool(DefaultConfigIniSection, 'MinimizeInsteadOfClose', False);
 
-  // PRO banner visibility
-  ProBannerVisible := Ini.ReadBool(DefaultConfigIniSection, 'ProBannerVisible', True);
-  if not ProBannerVisible then
-  begin
-    DT := ini.ReadDate(DefaultConfigIniSection, 'ProBannerClosedDate', MinDateTime);
-    if DaysBetween(DT, Now) >= 10 then
-    begin
-      ProBannerVisible := True;
-      Ini.WriteBool(DefaultConfigIniSection, 'ProBannerVisible', ProBannerVisible);
-    end;
-  end;
-  ProAdvPanel.Visible := ProBannerVisible;
-  Button1.Visible := ProBannerVisible;
+  // Ignore similar screenshots
+  SkipSimilar := ini.ReadBool(DefaultConfigIniSection, 'SkipSimilar', False);
+  SkipSimilarMatchPercent := ini.ReadInteger(DefaultConfigIniSection,
+               'SkipSimilarMatchPercent', DefaultSkipSimilarMatchPercent);
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -605,6 +618,10 @@ var
   HotKey: THotKey;
   IniFileName: String;
 begin
+  AutoCaptureTimer := TTimerV2.Create(Self);
+  AutoCaptureTimer.Enabled:=False;
+  AutoCaptureTimer.OnTimer:=@TimerTimer;
+
   {DebugLn('Program started');
   DebugLn('Version: ', GetProgramVersionStr);
   DebugLn('Initializing...');}
@@ -697,17 +714,23 @@ begin
   CheckForUpdates(False);
 end;
 
-procedure TMainForm.Button1Click(Sender: TObject);
+procedure TMainForm.AutoCaptureUpdaterTimerTimer(Sender: TObject);
+const
+  DefaultTimeout = 1000;
 begin
-  ProAdvPanel.Visible:=False;
-  (Sender as TButton).Visible:=False;
-  ini.WriteBool(DefaultConfigIniSection, 'ProBannerVisible', False);
-  ini.WriteDate(DefaultConfigIniSection, 'ProBannerClosedDate', Now);
-end;
+  UpdateStatusBarAndTrayIconText;
 
-procedure TMainForm.AboutProMenuItemClick(Sender: TObject);
-begin
-  OpenURL('https://artem78.github.io/AutoScreenshot/pages/pro.html?fromApp');
+  if IsTimerEnabled then
+  begin
+    if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
+      TrayIconState := tisUserIdle // user idle
+    else if {TrayIconState} FTrayIconState = tisUserIdle then
+      TrayIconState := tisDefault;
+  end;
+
+  // reset update interval to defaut value
+  if (Sender as TTimer).Interval <> DefaultTimeout then
+    (Sender as TTimer).Interval := DefaultTimeout;
 end;
 
 procedure TMainForm.AutoCheckForUpdatesMenuItemClick(Sender: TObject);
@@ -737,24 +760,24 @@ begin
     CanClose := ConfirmExit;
 end;
 
+procedure TMainForm.HelpWithTranslationMenuItemClick(Sender: TObject);
+begin
+  OpenURL('https://app.transifex.com/--334/autoscreenshot/dashboard/');
+end;
+
 procedure TMainForm.HomePageMenuItemClick(Sender: TObject);
 begin
   OpenURL('https://artem78.github.io/AutoScreenshot/?fromApp');
 end;
 
-procedure TMainForm.Label3Click(Sender: TObject);
+procedure TMainForm.ReportIssueMenuItemClick(Sender: TObject);
 begin
-  OpenURL('https://artem78.github.io/AutoScreenshot/pages/pro.html?fromApp');
+  OpenURL('https://github.com/artem78/AutoScreenshot/issues/new?assignees=&labels=bug&template=bug_report.md&title=');
 end;
 
-procedure TMainForm.Label3MouseEnter(Sender: TObject);
+procedure TMainForm.SkipSimilarCheckBoxChange(Sender: TObject);
 begin
-  Label3.Font.Style := Label3.Font.Style + [fsUnderline];
-end;
-
-procedure TMainForm.Label3MouseLeave(Sender: TObject);
-begin
-  Label3.Font.Style := Label3.Font.Style - [fsUnderline];
+  SkipSimilar := TCheckBox(Sender).Checked;
 end;
 
 procedure TMainForm.MinimizeInsteadOfCloseCheckBoxChange(Sender: TObject);
@@ -783,11 +806,6 @@ begin
   Ini.Free;
 
   DebugLn('Program ended');
-end;
-
-procedure TMainForm.FormShow(Sender: TObject);
-begin
-  RecalculateLabelWidths;
 end;
 
 procedure TMainForm.HotKetsSettingsMenuItemClick(Sender: TObject);
@@ -822,7 +840,7 @@ var
   Interval: TInterval;
 begin
   Interval := OldScreenshotCleaner.MaxAge;
-  Interval.Unit_:= TIntervalUnit(TComboBox(Sender).ItemIndex);
+  Interval.&Unit := TIntervalUnit(TComboBox(Sender).ItemIndex);
   OldScreenshotCleaner.MaxAge := Interval;
 end;
 
@@ -853,7 +871,7 @@ begin
     CaptureIntervalDateTimePicker.Time := IncSecond(CaptureIntervalDateTimePicker.Time, Seconds);
   end;
   Ini.WriteFloat(DefaultConfigIniSection, 'CaptureInterval', Seconds / SecsPerMin);
-  Timer.Interval := Seconds * MSecsPerSec;
+  AutoCaptureTimer.Interval := Seconds * MSecsPerSec;
 end;
 
 procedure TMainForm.PlaySoundsCheckBoxChange(Sender: TObject);
@@ -864,6 +882,17 @@ end;
 procedure TMainForm.PostCmdEditChange(Sender: TObject);
 begin
   Ini.WriteString(DefaultConfigIniSection, 'PostCmd', PostCommand);
+end;
+
+procedure TMainForm.PreCmdEditChange(Sender: TObject);
+begin
+  Ini.WriteString(DefaultConfigIniSection, 'PreCmd', PreCommand);
+end;
+
+procedure TMainForm.SkipSimilarMatchPercentSpinEditChange(Sender: TObject);
+begin
+  ini.WriteInteger(DefaultConfigIniSection, 'SkipSimilarMatchPercent',
+                                                    SkipSimilarMatchPercent);
 end;
 
 procedure TMainForm.TimerTimer(Sender: TObject);
@@ -878,11 +907,11 @@ begin
     // ToDo: May add comparision of current screenshot with the last one,
     // and if they equal, do not save current
 
-    if Timer.Interval > UserIdleTime then
+    if AutoCaptureTimer.Interval > UserIdleTime then
       MakeScreenshot
     else
       DebugLn('Automatic capture skipped (Timer.Interval=%d, UserIdleTime=%d)',
-          [Timer.Interval, UserIdleTime]);
+          [AutoCaptureTimer.Interval, UserIdleTime]);
   end
   else
     MakeScreenshot;
@@ -890,12 +919,12 @@ end;
 
 function TMainForm.GetTimerEnabled: Boolean;
 begin
-  Result := Timer.Enabled;
+  Result := AutoCaptureTimer.Enabled;
 end;
 
 procedure TMainForm.SetTimerEnabled(AEnabled: Boolean);
 begin
-  Timer.Enabled := AEnabled;
+  AutoCaptureTimer.Enabled := AEnabled;
   StartAutoCaptureButton.Enabled := not AEnabled;
   StopAutoCaptureButton.Enabled := AEnabled;
   // Tray menu
@@ -914,6 +943,9 @@ begin
     else
       PlaySound('stop.wav');
   end;
+
+  // Update statusbar
+  UpdateStatusBarAndTrayIconText;
 
   if AEnabled then
     DebugLn('Automatic capture started')
@@ -938,10 +970,33 @@ end;
 
 procedure TMainForm.MakeScreenshot;
 var
-  Cmd, ImageFileName, ErrMsg: String;
+  Cmd, ImageFileName, ErrMsg, LastImgFileName: String;
+  SimilarSkipped: Boolean = false;
 begin
   ImageFileName := ImagePath; // Use local variable because ImagePath() result
                               // may be changed on next call
+  // Run user command before screenshot
+  try
+    Cmd := PreCommand;
+    if Cmd <> '' then
+    begin
+//      Cmd := StringReplace(Cmd, '%FILENAME%', ImageFileName, [rfReplaceAll{, rfIgnoreCase}]);
+      DebugLn('Execute command before screenshot: ', Cmd);
+      RunCmd{Inbackground}(Cmd);
+      //DebugLn('Execution success!'); // Not works
+    end;
+  except
+    on E: Exception do
+    begin
+      DebugLn('Execution failed: ', E.ToString);
+
+      if not AutoCaptureTimer.Enabled then // Manual capture
+      begin
+        ErrMsg := {'Execution of custom command failed: ' +} E.Message;
+        MessageDlg('Auto Screenshot', ErrMsg, mtWarning, [mbOK], '');
+      end;
+    end;
+  end;
 
   PlaySound('camera_shutter.wav');
   TrayIconState := tisFlashAnimation;
@@ -956,16 +1011,36 @@ begin
       Grabber.CaptureMonitor(ImageFileName, MonitorId);
   end;
 
-  FileJournal.Add(ImageFileName);
+  LastImgFileName := FileJournal.LastAdded;
+  //FileJournal.Add(ImageFileName);
 
+  SimilarSkipped:=False;
+  If SkipSimilar and (LastImgFileName <> '') then
+  begin
+    if ImagesEqual(LastImgFileName, ImageFileName, SkipSimilarMatchPercent) then
+    begin
+      DeleteFile(ImageFileName);
+      DebugLn('Skip similar screenshot (%s ~ %s)', [LastImgFileName, ImageFileName]);
+      SimilarSkipped:=True;
+    end
+    else
+      FileJournal.Add(ImageFileName);
+  end
+  else
+    FileJournal.Add(ImageFileName);
 
-  // Run user command
+  if SimilarSkipped then
+    ShowNotificationInStatusBar(Localizer.I18N('ScreenshotSkipped'))
+  else
+    ShowNotificationInStatusBar(Format(Localizer.I18N('ScreenshotSaved'), [ImageFileName]));
+
+  // Run user command after screenshot
   try
     Cmd := PostCommand;
     if Cmd <> '' then
     begin
       Cmd := StringReplace(Cmd, '%FILENAME%', ImageFileName, [rfReplaceAll{, rfIgnoreCase}]);
-      DebugLn('Execute command: ', Cmd);
+      DebugLn('Execute command after screenshot: ', Cmd);
       RunCmdInbackground(Cmd);
       //DebugLn('Execution success!'); // Not works
     end;
@@ -974,7 +1049,7 @@ begin
     begin
       DebugLn('Execution failed: ', E.ToString);
 
-      if not Timer.Enabled then // Manual capture
+      if not AutoCaptureTimer.Enabled then // Manual capture
       begin
         ErrMsg := {'Execution of custom command failed: ' +} E.Message;
         MessageDlg('Auto Screenshot', ErrMsg, mtWarning, [mbOK], '');
@@ -1189,10 +1264,13 @@ end;
 procedure TMainForm.TranslateForm;
 const
   {$IfDef Windows}
-  CmdExample = 'copy "%FILENAME%" "C:\dir\"';
+  //PreCmdExample = 'msg "%username%" /time:4 "Screenshot will be taken after 5 seconds!" & timeout 5';
+  PreCmdExample = 'mshta vbscript:Execute("msgbox ""Press OK button to take screenshot"":close")';
+  PostCmdExample = 'copy "%FILENAME%" "C:\dir\"';
   {$EndIf}
   {$IfDef Linux}
-  CmdExample = 'cp "%FILENAME%" "~/dir/"';
+  PreCmdExample = 'zenity --notification --text="Screenshot will be taken after 5 seconds!" & sleep 5';
+  PostCmdExample = 'cp "%FILENAME%" "~/dir/"';
   {$EndIf}
 begin
   DisableAutoSizing;
@@ -1205,14 +1283,15 @@ begin
       LanguageSubMenu.Caption := LanguageSubMenu.Caption + ' (Language)';
     HelpSubMenu.Caption := Localizer.I18N('Help');
     AboutMenuItem.Caption := Localizer.I18N('About') + '...';
-    CheckForUpdatesMenuItem.Caption := Localizer.I18N('CheckForUpdates');
+    CheckForUpdatesMenuItem.Caption := Localizer.I18N('CheckForUpdates') + '...';
     AutoCheckForUpdatesMenuItem.Caption := Localizer.I18N('AutoCheckForUpdates');
     HotKetsSettingsMenuItem.Caption := Localizer.I18N('EditHotKeys') + '...';
     DonateMenuItem.Caption := Localizer.I18N('Donate');
     ExitMenuItem.Caption := Localizer.I18N('Exit');
     FileMenuItem.Caption := Localizer.I18N('File');
-    AboutProMenuItem.Caption := Localizer.I18N('TryPro') + '...';
     HomePageMenuItem.Caption := Localizer.I18N('VisitHomepage') + '...';
+    HelpWithTranslationMenuItem.Caption := Localizer.I18N('HelpWithTranslation') + '...';
+    ReportIssueMenuItem.Caption:=Localizer.I18N('ReportIssue')+'...';
 
     // Main form components
     OutputDirLabel.Caption := Localizer.I18N('OutputDirectory') + ':';
@@ -1241,7 +1320,7 @@ begin
     SeqNumberDigitsCountLabel.Caption := Localizer.I18N('Digits') + ':';
     PostCmdLabel.Caption := Localizer.I18N('RunCommand') + ':';
     PostCmdEdit.Hint := StringReplace(Localizer.I18N('RunCommandHelpText'),
-                                      '%s', CmdExample, []);
+                                      '%s', PostCmdExample, []);
 
     CompressionLevelLabel.Caption := Localizer.I18N('CompressionLevel') + ':';
     with CompressionLevelComboBox do
@@ -1265,10 +1344,6 @@ begin
 
     PlaySoundsCheckBox.Caption := Localizer.I18N('PlaySounds');
     MinimizeInsteadOfCloseCheckBox.Caption := Localizer.I18N('MinimizeInSteadOfClose');
-    Label1.Caption := Localizer.I18N('ProBannerText1') + ' ';
-    Label2.Caption := ' ' + Localizer.I18N('ProBannerText2') + ' ';
-    Label3.Caption := Localizer.I18N('ProBannerText3');
-    Button1.Caption := Localizer.I18N('Close');
 
     // Tray icon
     RestoreWindowTrayMenuItem.Caption := Localizer.I18N('Restore');
@@ -1276,11 +1351,15 @@ begin
     TakeScreenshotTrayMenuItem.Caption := Localizer.I18N('TakeScreenshot');
     ExitTrayMenuItem.Caption := Localizer.I18N('Exit');
 
+    PreCmdLabel.Caption := Localizer.I18N('RunCommandBefore') + ':';
+    PreCmdEdit.Hint := StringReplace(Localizer.I18N('RunCommandBeforeHelpText'),
+                                  '%s', PreCmdExample, []);
+
+    SkipSimilarCheckBox.Caption := Localizer.I18N('SkipSimilar');
+    SkipSimilarCheckBox.Hint := Localizer.I18N('SkipSimilarHint');
+    Label1.Caption := Localizer.I18N('Match');
   finally
     EnableAutoSizing;
-
-    // Recalculate with of labels area
-    RecalculateLabelWidths;
 
     UpdateFormAutoSize;
   end;
@@ -1507,7 +1586,8 @@ begin
         TrayIconIdx := Low(TrayIconIdx);
         TrayIconAnimationTimer.Enabled := True;
         ResName := Format('_CAMERA_FLASH_%d', [TrayIconIdx]);
-      end
+      end;
+    tisUserIdle: ResName := '_CAMERA_USER_IDLE'
     //tisDefault:
     else ResName := '_CAMERA';
   end;
@@ -1726,37 +1806,6 @@ begin
   raise Exception.CreateFmt('Language code "%s" not found', [ALangCode]);
 end;
 
-procedure TMainForm.RecalculateLabelWidths;
-var
-  MaxWidth: Integer;
-begin
-  MaxWidth := 0;
-  MaxWidth := max(MaxWidth, OutputDirLabel.Width);
-  MaxWidth := max(MaxWidth, FileNameTemplateLabel.Width);
-  MaxWidth := max(MaxWidth, CaptureIntervalLabel.Width);
-  MaxWidth := max(MaxWidth, ImageFormatLabel.Width);
-  MaxWidth := max(MaxWidth, MonitorLabel.Width);
-  MaxWidth := max(MaxWidth, PostCmdLabel.Width);
-
-  OutputDirEdit.Left := MaxWidth + OutputDirEdit.Parent.ChildSizing.LeftRightSpacing
-      + OutputDirEdit.Parent.ChildSizing.HorizontalSpacing;
-
-  // Sequential number group
-  RecalculateLabelWidthsForSeqNumGroup;
-end;
-
-procedure TMainForm.RecalculateLabelWidthsForSeqNumGroup;
-var
-  MaxWidth: Integer;
-begin
-  MaxWidth := 0;
-  MaxWidth := max(MaxWidth, SeqNumberValueLabel.Width);
-  MaxWidth := max(MaxWidth, SeqNumberDigitsCountLabel.Width);
-  SeqNumberValueSpinEdit.Left := MaxWidth
-      + SeqNumberGroup.ChildSizing.LeftRightSpacing
-      + SeqNumberGroup.ChildSizing.HorizontalSpacing;
-end;
-
 function TMainForm.GetLangCodeOfLangMenuItem(
   const LangItem: TMenuItem): TLanguageCode;
 begin
@@ -1814,8 +1863,6 @@ procedure TMainForm.UpdateSeqNumGroupVisibility;
 begin
   SeqNumberGroup.Visible := Pos('%NUM', FileNameTemplateComboBox.Text) <> 0;
   EmptyLabel1.Visible := SeqNumberGroup.Visible;
-  if SeqNumberGroup.Visible then
-    RecalculateLabelWidthsForSeqNumGroup;
 
   UpdateFormAutoSize;
 end;
@@ -2095,7 +2142,7 @@ begin
   Ini.WriteBool(DefaultConfigIniSection, 'OldScreenshotCleanerEnabled', OldScreenshotCleaner.Active);
 
   OldScreenshotCleanerMaxAgeValueSpinEdit.Value := OldScreenshotCleaner.MaxAge.Val;
-  OldScreenshotCleanerMaxAgeUnitComboBox.ItemIndex := Ord(OldScreenshotCleaner.MaxAge.Unit_);
+  OldScreenshotCleanerMaxAgeUnitComboBox.ItemIndex := Ord(OldScreenshotCleaner.MaxAge.&Unit);
   Ini.WriteString(DefaultConfigIniSection, 'OldScreenshotCleanerMaxAge', String(OldScreenshotCleaner.MaxAge));
 
   OldScreenshotCleanerMaxAgeValueSpinEdit.Enabled := OldScreenshotCleaner.Active;
@@ -2110,6 +2157,80 @@ begin
   //end;
 end;
 {$EndIf}
+
+procedure TMainForm.SetPreCommand(ACmd: String);
+begin
+  PreCmdEdit.Text := ACmd;
+end;
+
+function TMainForm.GetPreCommand: String;
+begin
+  Result := PreCmdEdit.Text;
+end;
+
+procedure TMainForm.SetSkipSimilar(AVal: Boolean);
+begin
+  SkipSimilarCheckBox.Checked := AVal;
+  ini.WriteBool(DefaultConfigIniSection, 'SkipSimilar' ,AVal);
+
+  Label1.Enabled := AVal;
+  SkipSimilarMatchPercentSpinEdit.Enabled := AVal;
+  Label2.Enabled := AVal;
+end;
+
+function TMainForm.GetSkipSimilar: Boolean;
+begin
+  Result := SkipSimilarCheckBox.Checked;
+end;
+
+procedure TMainForm.SetSkipSimilarMatchPercent(AVal: Integer);
+begin
+  SkipSimilarMatchPercentSpinEdit.Value := AVal;
+  ini.WriteInteger(DefaultConfigIniSection, 'SkipSimilarMatchPercent', AVal);
+end;
+
+function TMainForm.GetSkipSimilarMatchPercent: Integer;
+begin
+  Result := SkipSimilarMatchPercentSpinEdit.Value;
+end;
+
+procedure TMainForm.UpdateStatusBarAndTrayIconText;
+var
+  Sec: Integer;
+begin
+  TrayIcon.Hint := Application.Title;
+
+  if not IsTimerEnabled then
+  begin
+    StatusBar1.SimpleText:='';
+    TrayIcon.Hint := Format('%s - %s', [Application.Title, Localizer.I18N('AutoCaptureDisabled')]);
+  end
+  else
+  begin
+    if StopWhenInactive and not (AutoCaptureTimer.Interval > UserIdleTime) then
+    begin  // user inactive
+      StatusBar1.SimpleText := Localizer.I18N('AutoCapturePaused');
+    end
+    else   // show next run time
+    begin
+      Sec := AutoCaptureTimer.SecondsBeforeNextExecution;
+      if Sec < 0 then
+        StatusBar1.SimpleText := ''
+      else
+      begin
+        //Text := Format('Next shot after %d seconds', [Sec]);
+        StatusBar1.SimpleText := Format(Localizer.I18N('TimeToNextShot'), [SecondsToHMS(Sec)]);
+        TrayIcon.Hint := Format('%s - %s', [Application.Title, StatusBar1.SimpleText]);
+      end;
+    end;
+  end;
+end;
+
+procedure TMainForm.ShowNotificationInStatusBar(AMsg: string);
+begin
+  StatusBar1.SimpleText:=amsg;
+  AutoCaptureUpdaterTimer.Interval:=3000; // prevent immediately text rewrite by timer
+end;
 
 {$IfDef Windows}
 procedure TMainForm.WMHotKey(var AMsg: TMessage);

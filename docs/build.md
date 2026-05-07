@@ -1,6 +1,16 @@
 # How to build AutoScreenshot from sources
 
-This program written in Pascal in Lazarus IDE (similar to Delphi).
+This program written with Pascal language in Lazarus IDE (similar to Delphi).
+
+## Tools required
+
+- Windows or Linux machine
+- Lazarus IDE
+- Free Pascal Compiler
+- GIT
+- Apache Ant
+
+## Step-by-step instruction
 
 1) Download project sources
    ```
@@ -26,14 +36,15 @@ This program written in Pascal in Lazarus IDE (similar to Delphi).
       ![](images/build/2026-04-08_20-50-11.png)
       
       IDE will reboot after each package installation
-4) Download sqlite3.dll **(FOR WINDOWS ONLY)**
-    * Go to https://sqlite.org/download.html
-    * Scroll to "Precompiled Binaries for Windows"
-    * Download ZIP for your arch. (more likely sqlite-dll-win-**x64**-XXXXXX.zip)
-    * From arhive extract file `sqlite3.dll` to the project directory (where AutoScreenshot.lpi file located)
-6) In Lazarus IDE go to `Project` -> `Open project...` and select `AutoScreenshot.lpi` file in project sources dir
-7) Choose `Debug` build mode and press green arrow (or F9)
-
+4) Download DLLs **(FOR WINDOWS ONLY)**
+   
+   Put [all required DLLs](dll_dependencies.md) (10 at the moment) to the project main directory. The easiest way to do this is to run this [Apache Ant](https://ant.apache.org/) command in project dir
+   ```
+   ant download_dlls
+   ```
+   Or just copy them from portable release zip.
+5) In Lazarus IDE go to `Project` -> `Open project...` and select `AutoScreenshot.lpi` file in project sources dir
+6) Choose `Debug` build mode and press green arrow (or F9)
    ![](images/build/2026-04-08_21-04-31.png)
 8) If the build completes successfully you should see working AutoScreenshot application
 

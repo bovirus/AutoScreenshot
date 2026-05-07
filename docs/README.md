@@ -13,15 +13,13 @@ Auto Screenshot
 [![Supports Windows](https://img.shields.io/badge/support-Windows-blue?logo=Windows&style=plastic)](https://github.com/artem78/AutoScreenshot/releases/latest)
 [![Supports Linux](https://img.shields.io/badge/support-Linux-white?logo=Linux&style=plastic)](https://github.com/artem78/AutoScreenshot/releases/latest)
 
-<u>**Project moved to <https://artem78.github.io/AutoScreenshot/> !**</u>
-
 ## Overview
 **Auto Screenshot** — application for automatic taking screenshots with specified time interval.
 
 ## Features
 * Automatic saving screenshots of full screen with specified time interval (from 1 second to 24 hours)
-* Saving images in PNG, JPEG, BMP, TIFF <!--or GIF--> format
-* Pause capture when user is inactive (depending on mouse moves and keyboard events) 
+* Saving images in PNG, JPEG, BMP, TIFF, WEBP or AVIF format
+* Pause capture when user is inactive (depending on mouse moves and keyboard events)
 * Customizable output filenames with variables (date, time, user, computer name, sequential number) and ability of grouping by folders (for example: by day or month)
 * Automatic capture can be started on system startup
 * Multiple screens support
@@ -34,11 +32,23 @@ Auto Screenshot
 * Absolutely free and open source
 
 ## Screenshots
+<!--
 ![Main program window in Windows 7](images/main_window.png "Main program window in Windows 7")
 
 ![Tray icon](images/tray_icon_animation.gif "Tray icon")
+-->
 
-![Runinng on Linux Mint](images/main_window_in_linux_mint.png "Runinng on Linux Mint")
+![Main window in Linux Mint](images/main_window_in_linux_mint.png "Main window in Linux Mint")
+
+![Predefined filename templates](images/filename_template_samples.png "Predefined filename templates")
+
+![Filename variables description](images/filename_template_vars.png "Filename variables description")
+
+![Image format selection](images/image_format_selection.png "Image format selection")
+
+![Monitor selection](images/monitors.png "Monitor selection")
+
+![Hotkeys](images/hotkeys.png "Hotkeys")
 
 ## Languages
 * English
@@ -97,4 +107,4 @@ Artem78 (email: [megabyte1024@ya.ru](mailto:megabyte1024@ya.ru?subject=AutoScree
 - ЮMoney (yoomoney): [4100 1195 0619 6001](https://yoomoney.ru/to/4100119506196001)
 
 ## Links
-- [AutoScreenshot new website](https://artem78.github.io/AutoScreenshot/)
+- [AutoScreenshot website](https://artem78.github.io/AutoScreenshot/)

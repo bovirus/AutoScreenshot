@@ -71,13 +71,19 @@ function GetAlternativeLanguage(const ALangs: TLanguagesArray;
 procedure AutoRun(const FileName: String; const AppTitle: String;
     Enabled: Boolean = True);
 function CheckAutoRun(const FileName: String; const AppTitle: String): Boolean;
-procedure RunCmdInbackground(ACmd: String);
+procedure RunCmd(const ACmd: String; AInBackground: Boolean = False);
+procedure RunCmdInBackground(const ACmd: string);
 function IsPortable: Boolean;
 function GetUserPicturesDir: WideString;
 
 // todo: make tests
 function DirectoryIsEmpty(const ADir: String): Boolean;
 function ParentDirectory(const ADir: String): String;
+
+function ISO8601ToReadableDate(const AStr: string): string;
+
+// 3723 => 01:02:03
+function SecondsToHMS(ASecs: Integer): string;
 
 implementation
 
@@ -181,7 +187,7 @@ end;
 //  end;
 //end;
 
-function GetProgramVersionStr: String;
+function GetProgramVersionStr: string;
 var
   FileVerInfo: TFileVersionInfo;
 begin
@@ -395,7 +401,12 @@ begin
   {$EndIf}
 end;
 
-procedure RunCmdInbackground(ACmd: String);
+procedure RunCmdInBackground(const ACmd: String);
+begin
+  RunCmd(ACmd, True);
+end;
+
+procedure RunCmd(const ACmd: String; AInBackground: Boolean);
 var
   proc: TProcess;
 begin
@@ -412,6 +423,10 @@ begin
     proc.Parameters.Add(ACmd);
     {$EndIf}
     proc.Options := proc.Options + [poNoConsole];
+    if AInBackground then
+      proc.Options := proc.Options - [poWaitOnExit]
+    else
+      proc.Options := proc.Options + [poWaitOnExit];
     proc.Execute;
   finally
     proc.Free;
@@ -485,6 +500,23 @@ function ParentDirectory(const ADir: String): String;
 // https://stackoverflow.com/a/30811944/4108542
 begin
    Result := ExtractFilePath(ExcludeTrailingPathDelimiter(ADir));
+end;
+
+function ISO8601ToReadableDate(const AStr: string): string; // without time
+var
+  dt: TDate;
+begin
+  dt := ISO8601ToDate(AStr);
+  Result := DateToStr(dt);
+end;
+
+function SecondsToHMS(ASecs: Integer): string;
+var
+  DT, TDiff: TDateTime;
+begin
+  DT := IncSecond(Now, ASecs);
+  TDiff:=DT-Now;
+  Result:=TimeToStr(TDiff);
 end;
 
 {$IfDef Windows}

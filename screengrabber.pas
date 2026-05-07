@@ -8,13 +8,13 @@ uses
   Classes, SysUtils, ZStream { for Tcompressionlevel };
 
 type
-  TImageFormat = (fmtPNG=0, fmtJPG, fmtBMP{, fmtGIF}, fmtTIFF);
+  TImageFormat = (fmtPNG=0, fmtJPG, fmtBMP{, fmtGIF}, fmtTIFF, fmtWEBP, fmtAVIF);
 
   TColorDepth = (cd8Bit=8, cd16Bit=16, cd24Bit=24, cd32Bit=32);
 
   TImageFormatInfo = record
     Name: String[10];
-    Extension: String[3];
+    Extension: String[4];
     HasQuality: Boolean;
     HasGrayscale: Boolean;
     ColorDepth: Set of TColorDepth;
@@ -84,6 +84,22 @@ const
       HasGrayscale: False;
       ColorDepth:   [];
       HasCompressionLevel: False
+    ),
+    (
+      Name:         'WebP';
+      Extension:    'webp';
+      HasQuality:   False;
+      HasGrayscale: False;
+      ColorDepth:   [];
+      HasCompressionLevel: False
+    ),
+    (
+      Name:         'AVIF';
+      Extension:    'avif';
+      HasQuality:   False;
+      HasGrayscale: False;
+      ColorDepth:   [];
+      HasCompressionLevel: False
     )
   );
 
@@ -94,8 +110,9 @@ uses
   {$IfDef Windows}
   windows,
   {$EndIf}
-  Forms {for TMonitor}, LCLType, LCLIntf, BGRABitmap, BGRABitmapTypes, FPWriteJPEG, FPWriteBMP,
-  FPWritePNG, FPImage, FPWriteTiff, LazLoggerBase;
+  Forms, LCLType, LCLIntf, BGRABitmap, BGRABitmapTypes, BGRAWriteWebP,
+  BGRAWriteAvif, libavif, FPWriteJPEG, FPWriteBMP, FPWritePNG, FPImage,
+  FPWriteTiff, LazLoggerBase;
 
 { TScreenGrabber }
 
@@ -208,6 +225,20 @@ begin
       fmtTIFF:
         begin
           Writer := TFPWriterTiff.Create;
+        end;
+
+      fmtWEBP:
+        begin
+          Writer := TBGRAWriterWebP.Create;
+        end;
+
+      fmtAVIF:
+        begin
+          {$IfDef Windows}
+          // flipped image fix
+          Bitmap.VerticalFlip();
+          {$EndIf}
+          Writer := TBGRAWriterAvif.Create;
         end;
   end;
 

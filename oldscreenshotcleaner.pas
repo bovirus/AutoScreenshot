@@ -12,7 +12,7 @@ type
 
   TInterval = record
     Val: Cardinal;
-    Unit_: TIntervalUnit;
+    &Unit: TIntervalUnit;
   end;
 
   TOldScreenshotCleanerChangeCallback = procedure of object;
@@ -67,6 +67,10 @@ type
     procedure Remove(AMaxDateTime: TDateTime);
     function GetFiles(AMaxDateTime: TDateTime): TStringList;
     function GetDirs(AMaxDateTime: TDateTime): TStringList;
+
+    { Returns filename of last added file. Function returns empty string
+      if database is empty }
+    function LastAdded: String;
   end;
 
 
@@ -90,14 +94,14 @@ const
   {$IFOPT D+}
     5 * MSecsPerSec; // 5 seconds
   {$Else}
-    30 * MSecsPerSec * SecsPerMin; // 30 minutes
+    {30} 10 * MSecsPerSec * SecsPerMin; // 10 minutes
   {$ENDIF}
 
 operator explicit (const AInterval: TInterval): String;
 var
   UnitShortName: Char;
 begin
-  case AInterval.Unit_ of
+  case AInterval.&Unit of
     iuHours:  UnitShortName := 'h';
     iuDays:   UnitShortName := 'd';
     iuWeeks:  UnitShortName := 'w';
@@ -116,10 +120,10 @@ begin
 
   UnitShortName := AStr[Length(AStr)];
   case UnitShortName of
-    'h': Result.Unit_ := iuHours;
-    'd': Result.Unit_ := iuDays;
-    'w': Result.Unit_ := iuWeeks;
-    'm': Result.Unit_ := iuMonths;
+    'h': Result.&Unit := iuHours;
+    'd': Result.&Unit := iuDays;
+    'w': Result.&Unit := iuWeeks;
+    'm': Result.&Unit := iuMonths;
     else raise Exception.CreateFmt('Unknown unit character ''%s''', [UnitShortName]);
   end;
   Result.Val := StrToInt(Copy(AStr, 1, Length(AStr) - 1));
@@ -127,7 +131,7 @@ end;
 
 operator - (ADateTime: TDateTime; AInterval: TInterval): TDateTime;
 begin
-  case AInterval.Unit_ of
+  case AInterval.&Unit of
     iuHours:  Result := IncHour(ADateTime, -AInterval.Val);
     iuDays:   Result := IncDay(ADateTime, -AInterval.Val);
     iuWeeks:  Result := IncDay(ADateTime, -AInterval.Val * 7);
@@ -306,12 +310,31 @@ begin
   end;
 end;
 
+function TFileJournal.LastAdded: String;
+begin
+  Result := '';
+
+  with SQLQuery do
+  begin
+    SQL.Clear;
+    SQL.Append('SELECT `filename`/*, `created`*/');
+    SQL.Append('FROM `' + Sqlite3Dataset.TableName + '`');
+    SQL.Append('ORDER BY `created` DESC');
+    SQL.Append('LIMIT 1;');
+    Open;
+    First;
+    if not EOF then
+      Result := FieldByName('filename').AsString;
+    Close;
+  end;
+end;
+
 
 { TOldScreenshotCleaner }
 
 procedure TOldScreenshotCleaner.SetMaxAge(AMaxAge: TInterval);
 begin
-  //if (FMaxAge.Unit_ = AMaxAge.Unit_) and (FMaxAge.Val = AMaxAge.Val) then
+  //if (FMaxAge.&Unit = AMaxAge.&Unit) and (FMaxAge.Val = AMaxAge.Val) then
   //  Exit;
 
   FMaxAge := AMaxAge;
