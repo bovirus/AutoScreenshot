@@ -25,7 +25,7 @@ Auto Screenshot
 * Automatic capture can be started on system startup
 * Multiple screens support
 * High DPI support
-* Can execute custom command after screenshot was taken
+* Can execute custom command before and after screenshot was taken
 * Clearing old screenshots
 * Play sound when screenshot taken
 * Hotkeys
