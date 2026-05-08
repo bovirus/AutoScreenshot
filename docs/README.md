@@ -33,11 +33,12 @@ Auto Screenshot
 * Absolutely free and open source
 
 ## Screenshots
-<!--
-![Main program window in Windows 7](images/main_window.png "Main program window in Windows 7")
+
+![Program running on Windows 10](images/main_window_w10.png "Program running on Windows 10")
+
+![Main program window in Windows 7](images/main_window_w7.png "Main program window in Windows 7")
 
 ![Tray icon](images/tray_icon_animation.gif "Tray icon")
--->
 
 ![Main window in Linux Mint](images/main_window_in_linux_mint.png "Main window in Linux Mint")
 
@@ -63,10 +64,10 @@ Auto Screenshot
 * [French](README-fr.md)
 * [Italian](README-it.md)
 
-[(Help with new translations)](https://github.com/artem78/AutoScreenshot/issues/5)
+[(Help with new translations)](#Translation)
 
 ## Supported operation systems
-* Microsoft Windows XP or higher (32/64-bit)
+* Microsoft Windows XP, 7, 8, 10, 11 (32/64-bit)
 * Linux
 
 ## Download
@@ -87,13 +88,19 @@ sudo apt-get install openssl libssl-dev
 
 ## Building from sources
 
-Described in [/docs/build.md](/docs/build.md)
+Described in [docs/build.md](/docs/build.md)
 
 ## How can I help?
 * [Report about found bug](https://github.com/artem78/AutoScreenshot/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
 * [Suggest new idea or feature](https://github.com/artem78/AutoScreenshot/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
-* [Make new translation](https://github.com/artem78/AutoScreenshot/issues/5)
+* Help with translation
 * [Make a donation](#donate)
+
+### Translation
+
+You can edit any translation or create new one. Join this project on Transifex.com: https://app.transifex.com/--334/autoscreenshot/dashboard/
+
+Also you can edit language files directly in the repository. Localization file format and process details described here - https://github.com/artem78/AutoScreenshot/wiki/UI-localization
 
 ## License
 You are free to use, modify or distribute this software under the [GNU GPL v3.0](https://github.com/artem78/AutoScreenshot/blob/master/LICENSE.txt) license.
@@ -110,3 +117,4 @@ Artem78 (email: [megabyte1024@ya.ru](mailto:megabyte1024@ya.ru?subject=AutoScree
 
 ## Links
 - [Auto Screenshot website](https://artem78.github.io/AutoScreenshot/)
+- https://app.transifex.com/--334/autoscreenshot/dashboard/
