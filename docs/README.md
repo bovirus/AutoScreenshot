@@ -61,7 +61,7 @@ Auto Screenshot
 * Turkish
 * German
 * [French](README-fr.md)
-* Italian
+* [Italian](README-it.md)
 
 [(Help with new translations)](https://github.com/artem78/AutoScreenshot/issues/5)
 
