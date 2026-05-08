@@ -52,7 +52,7 @@ Auto Screenshot
 ![Tasti rapidi](images/hotkeys.png "Hotkeys")
 
 ## Lingue
-* Inglese
+* [Inglese](README.md)
 * [Russo](README-ru.md)
 * Cinese
 * Ucraino
@@ -61,7 +61,7 @@ Auto Screenshot
 * Turco
 * Tedesco
 * [Francese](README-fr.md)
-* [Italiano](README-it.md)
+* Italiano
 
 [(Aiutaci con la traduzione)](https://github.com/artem78/AutoScreenshot/issues/5)
 
