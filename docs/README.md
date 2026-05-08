@@ -1,5 +1,6 @@
 [:fr: FR](README-fr.md "French")&nbsp;&nbsp;
-[:ru: RU](README-ru.md "Russian")
+[:ru: RU](README-ru.md "Russian")&nbsp;&nbsp;
+[:it: IT](README-it.md "Italian")
 
 -------------------------  
 
@@ -24,7 +25,7 @@ Auto Screenshot
 * Automatic capture can be started on system startup
 * Multiple screens support
 * High DPI support
-* Can execute custom command after screenshot was taken
+* Can execute custom command before and after screenshot was taken
 * Clearing old screenshots
 * Play sound when screenshot taken
 * Hotkeys
@@ -60,7 +61,7 @@ Auto Screenshot
 * Turkish
 * German
 * [French](README-fr.md)
-* Italian
+* [Italian](README-it.md)
 
 [(Help with new translations)](https://github.com/artem78/AutoScreenshot/issues/5)
 
@@ -108,4 +109,4 @@ Artem78 (email: [megabyte1024@ya.ru](mailto:megabyte1024@ya.ru?subject=AutoScree
 - ЮMoney (yoomoney): [4100 1195 0619 6001](https://yoomoney.ru/to/4100119506196001)
 
 ## Links
-- [AutoScreenshot website](https://artem78.github.io/AutoScreenshot/)
+- [Auto Screenshot website](https://artem78.github.io/AutoScreenshot/)
