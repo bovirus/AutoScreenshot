@@ -110,3 +110,4 @@ Artem78 (email: [megabyte1024@ya.ru](mailto:megabyte1024@ya.ru?subject=AutoScree
 
 ## Collegamenti
 - [Sito web Auto Screenshot](https://artem78.github.io/AutoScreenshot/)
+- [Auto Screenshot - File traduzioni su Transiflex](https://app.transifex.com/--334/autoscreenshot/dashboard/)
