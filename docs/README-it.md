@@ -100,9 +100,9 @@ Descritto in [/docs/build.md](/docs/build.md)
 
 ### Traduzione
 
-Puoi modificare qualsiasi traduzione o crearne una nuova. Partecipa alla localizzazione su Transifex.com: [Pagina progetto traduzione su Transiflex](https://app.transifex.com/--334/autoscreenshot/dashboard/)
+Puoi modificare la traduzione o crearne una nuova. Partecipa alla localizzazione su Transifex.com: [Transiflex - Traduzione Auto Screenshot](https://app.transifex.com/--334/autoscreenshot/dashboard/)
 
-Inoltre puoi modificare i file lingua direttamente nel repository. Formato del file di localizzazione e dettagli del processo sono descritti qui: [istruzioen localizzazione Auto Screenshot su GitHub](https://github.com/artem78/AutoScreenshot/wiki/UI-localization)
+Puoi modificare i file lingua direttamente nel repository. Formato del file lingua e ulteriori dettagli sono descritti qui: [istruzioen localizzazione Auto Screenshot su GitHub](https://github.com/artem78/AutoScreenshot/wiki/UI-localization)
 
 ## Licenza
 Sei libero di usare, modificare o distribuire questo software sotto licenza [GNU GPL v3.0](https://github.com/artem78/AutoScreenshot/blob/master/LICENSE.txt).
