@@ -66,7 +66,7 @@ Auto Screenshot
 * [Francese](README-fr.md)
 * Italiano
 
-[(Aiutaci con la traduzione)](#Translation)
+[(Aiutaci con la traduzione)](#Traduzione)
 
 ## Sistemi operativi supportati
 * Microsoft Windows XP, 7, 8, 10, 11 (32/64-bit)
@@ -98,7 +98,7 @@ Descritto in [/docs/build.md](/docs/build.md)
 * Aiutarci con la traduzione
 * [Facendo una donazione](#donate)
 
-### Traduzione
+## Traduzione
 
 Puoi modificare la traduzione o crearne una nuova. Partecipa alla localizzazione su Transifex.com: <br/>[Transiflex - Traduzione Auto Screenshot](https://app.transifex.com/--334/autoscreenshot/dashboard/)
 
